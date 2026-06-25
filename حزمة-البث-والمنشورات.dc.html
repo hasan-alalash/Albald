@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  @keyframes crawl{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @keyframes livepulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+</style>
+</helmet>
+<div dir="rtl" style="background:#e7e2d6;min-width:100%;width:max-content;min-height:100vh;box-sizing:border-box;padding:54px;font-family:'Cairo',sans-serif;color:#1b2326;">
+
+  <div style="font-family:'Tajawal',sans-serif;font-weight:900;font-size:32px;margin-bottom:6px;">حزمة المنشورات وعناصر البث المباشر</div>
+  <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:16px;color:#c1624c;margin-bottom:40px;">راديو البلد · FM 102.6 — مبنية على الهوية البصرية</div>
+
+  <!-- ================= PART A : POSTS ================= -->
+  <div style="font-family:'Tajawal',sans-serif;font-weight:800;font-size:20px;color:#1b2326;margin:0 0 22px;display:flex;align-items:center;gap:12px;">
+    <span style="width:30px;height:3px;background:#f2d47e;"></span> منشورات وعناصر جديدة
+  </div>
+
+  <div style="display:flex;gap:40px;align-items:flex-start;margin-bottom:60px;">
+
+    <!-- عاجل word graphic -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">شارة «عاجل» — مربّع</div>
+      <div style="width:380px;height:380px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="position:absolute;top:0;right:0;left:0;height:8px;background:#f2d47e;"></div>
+        <div style="text-align:center;">
+          <div style="display:inline-flex;align-items:flex-end;gap:0;">
+            <div style="background:#b94126;border-radius:6px;padding:8px 11px;font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:15px;line-height:1.05;direction:ltr;">05.05<br>2026</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#c1624c;font-size:90px;line-height:.9;padding-right:10px;">عَاجـل</div>
+          </div>
+          <div style="color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:700;font-size:20px;margin-top:18px;">صوت البلد · FM 102.6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- هام word graphic -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">شارة «هام» — مربّع</div>
+      <div style="width:380px;height:380px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#c1624c;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="position:absolute;top:0;right:0;left:0;height:8px;background:#f2d47e;"></div>
+        <div style="text-align:center;">
+          <div style="display:inline-flex;align-items:flex-end;gap:0;">
+            <div style="background:#1b2326;border-radius:6px;padding:8px 11px;font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:15px;line-height:1.05;direction:ltr;">05.05<br>2026</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:96px;line-height:.9;padding-right:10px;">هـام</div>
+          </div>
+          <div style="color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:700;font-size:20px;margin-top:18px;">صوت البلد · FM 102.6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Program post -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">منشور برنامج</div>
+      <div style="width:380px;height:380px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <div style="height:218px;border:4px solid #f2d47e;border-top:none;border-left:none;border-right:none;background:repeating-linear-gradient(135deg,#2a3236 0 14px,#242b2f 14px 28px);display:flex;align-items:center;justify-content:center;color:#5d676b;font-family:monospace;font-size:13px;">ضع صورة المذيع / البرنامج</div>
+        <div style="padding:24px 26px;">
+          <div style="display:inline-block;background:#c1624c;color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;padding:5px 14px;border-radius:4px;">برنامج</div>
+          <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:34px;margin-top:14px;line-height:1.1;">اسم البرنامج</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px;color:#f2d47e;font-family:'Tajawal',sans-serif;font-weight:700;font-size:16px;">
+            <span style="width:26px;height:3px;background:#f2d47e;"></span> كل يوم · 8:00 مساءً
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quote post -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">منشور اقتباس</div>
+      <div style="width:380px;height:380px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#fdf6e3;position:relative;overflow:hidden;padding:40px 34px;display:flex;flex-direction:column;justify-content:center;background-image:url(assets/pattern-brick.png);background-size:cover;background-position:center;">
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;font-size:80px;color:#c1624c;line-height:.6;height:40px;">”</div>
+        <p style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:27px;line-height:1.6;color:#1b2326;margin:10px 0;">نضع هنا الاقتباس أو العبارة المميّزة من الحلقة أو الضيف.</p>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+          <span style="width:34px;height:4px;background:#f2d47e;border-radius:2px;"></span>
+          <span style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:15px;color:#b94126;">اسم الضيف · صفته</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= PART B : BROADCAST ================= -->
+  <div style="font-family:'Tajawal',sans-serif;font-weight:800;font-size:20px;color:#1b2326;margin:0 0 22px;display:flex;align-items:center;gap:12px;">
+    <span style="width:30px;height:3px;background:#f2d47e;"></span> عناصر شاشة البث المباشر
+  </div>
+
+  <!-- Full screen example -->
+  <div style="margin-bottom:48px;">
+    <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">الشاشة الكاملة — كل العناصر مجتمعة (1920×1080)</div>
+    <div style="width:960px;height:540px;border-radius:2px;box-shadow:0 2px 10px rgba(0,0,0,.15);position:relative;overflow:hidden;background:linear-gradient(135deg,#2c3539,#1b2326);">
+      <!-- video placeholder hint -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.10);font-family:monospace;font-size:15px;">بث الفيديو المباشر</div>
+
+      <!-- logo bug top-right -->
+      <img src="assets/logo-white.png" style="position:absolute;top:22px;right:26px;height:50px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));">
+
+      <!-- live badge top-left -->
+      <div style="position:absolute;top:26px;left:26px;display:flex;align-items:center;gap:8px;background:#b94126;border-radius:5px;padding:7px 14px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:#fdf6e3;animation:livepulse 1.4s infinite;"></span>
+        <span style="font-family:'Tajawal',sans-serif;font-weight:800;color:#fdf6e3;font-size:15px;letter-spacing:1px;">مباشر</span>
+      </div>
+
+      <!-- guest lower third -->
+      <div style="position:absolute;right:34px;bottom:118px;display:flex;align-items:stretch;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.45);">
+        <div style="width:8px;background:#f2d47e;"></div>
+        <div style="background:rgba(27,35,38,.92);padding:13px 26px 13px 22px;">
+          <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:27px;line-height:1.1;">اسم الضيف</div>
+          <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:15px;margin-top:3px;">صفة الضيف / المنصب</div>
+        </div>
+      </div>
+
+      <!-- bottom bar: ticker + headline tab + clock -->
+      <div style="position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:stretch;font-family:'Tajawal',sans-serif;">
+        <!-- headline tab -->
+        <div style="background:#b94126;display:flex;align-items:center;padding:0 22px;flex:none;">
+          <span style="font-weight:900;color:#fdf6e3;font-size:21px;">عاجل</span>
+        </div>
+        <!-- ticker -->
+        <div style="flex:1;background:rgba(27,35,38,.94);overflow:hidden;display:flex;align-items:center;position:relative;border-top:3px solid #f2d47e;">
+          <div style="display:flex;white-space:nowrap;animation:crawl 26s linear infinite;will-change:transform;">
+            <span style="font-weight:700;color:#fdf6e3;font-size:19px;padding:0 40px;">آخر الأخبار تظهر هنا كشريط متحرك أسفل الشاشة لعرض العناوين المتتالية على مدار البث المباشر.</span>
+            <span style="font-weight:700;color:#fdf6e3;font-size:19px;padding:0 40px;">آخر الأخبار تظهر هنا كشريط متحرك أسفل الشاشة لعرض العناوين المتتالية على مدار البث المباشر.</span>
+          </div>
+        </div>
+        <!-- clock -->
+        <div style="background:#f2d47e;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 20px;flex:none;">
+          <span style="font-weight:900;color:#1b2326;font-size:23px;direction:ltr;">{{ clock }}</span>
+          <span style="font-weight:700;color:#7a5a2a;font-size:11px;">FM 102.6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Individual elements row -->
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+
+    <!-- Lower third: guest -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">شريط اسم الضيف</div>
+      <div style="width:520px;height:240px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:repeating-linear-gradient(135deg,#3a4347 0 16px,#333c40 16px 32px);position:relative;overflow:hidden;">
+        <div style="position:absolute;right:30px;bottom:34px;display:flex;align-items:stretch;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.45);">
+          <div style="width:8px;background:#f2d47e;"></div>
+          <div style="background:rgba(27,35,38,.94);padding:13px 26px;">
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:26px;">اسم الضيف</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:14px;margin-top:3px;">صفة الضيف / المنصب</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower third: program -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">شريط اسم البرنامج</div>
+      <div style="width:520px;height:240px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:repeating-linear-gradient(135deg,#3a4347 0 16px,#333c40 16px 32px);position:relative;overflow:hidden;">
+        <div style="position:absolute;right:30px;bottom:34px;display:flex;align-items:stretch;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.45);">
+          <div style="background:#c1624c;display:flex;align-items:center;padding:0 16px;"><span style="font-family:'Tajawal',sans-serif;font-weight:800;color:#fdf6e3;font-size:14px;">على الهواء</span></div>
+          <div style="background:rgba(253,246,227,.96);padding:13px 26px;">
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#1b2326;font-size:26px;">اسم البرنامج</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#b94126;font-size:14px;margin-top:3px;">مع المذيع · 8:00 مساءً</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breaking bar -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">شريط الخبر العاجل</div>
+      <div style="width:520px;height:240px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:repeating-linear-gradient(135deg,#3a4347 0 16px,#333c40 16px 32px);position:relative;overflow:hidden;">
+        <div style="position:absolute;left:0;right:0;bottom:30px;display:flex;align-items:stretch;font-family:'Tajawal',sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.4);">
+          <div style="background:#b94126;display:flex;align-items:center;padding:0 22px;"><span style="font-weight:900;color:#fdf6e3;font-size:24px;">عاجل</span></div>
+          <div style="flex:1;background:rgba(27,35,38,.95);border-top:3px solid #f2d47e;display:flex;align-items:center;padding:0 22px;">
+            <span style="font-weight:700;color:#fdf6e3;font-size:20px;line-height:1.3;">عنوان الخبر العاجل يُكتب هنا بخط واضح وكبير.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Headline/topic bar -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">شريط عنوان الخبر</div>
+      <div style="width:520px;height:240px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:repeating-linear-gradient(135deg,#3a4347 0 16px,#333c40 16px 32px);position:relative;overflow:hidden;">
+        <div style="position:absolute;left:0;right:0;bottom:30px;font-family:'Tajawal',sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.4);">
+          <div style="background:rgba(27,35,38,.95);border-right:8px solid #f2d47e;padding:16px 24px;">
+            <div style="color:#f2d47e;font-weight:800;font-size:14px;letter-spacing:1px;margin-bottom:5px;">محلي · أخبار</div>
+            <div style="color:#fdf6e3;font-weight:900;font-size:23px;line-height:1.3;">عنوان الموضوع المطروح في الحلقة يُكتب هنا.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticker only -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">الشريط السفلي المتحرك (الأخبار)</div>
+      <div style="width:1080px;height:120px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:repeating-linear-gradient(135deg,#3a4347 0 16px,#333c40 16px 32px);position:relative;overflow:hidden;">
+        <div style="position:absolute;left:0;right:0;bottom:18px;height:64px;display:flex;align-items:stretch;font-family:'Tajawal',sans-serif;">
+          <div style="background:#b94126;display:flex;align-items:center;padding:0 22px;flex:none;"><span style="font-weight:900;color:#fdf6e3;font-size:19px;">أخبار البلد</span></div>
+          <div style="flex:1;background:rgba(27,35,38,.95);border-top:3px solid #f2d47e;overflow:hidden;display:flex;align-items:center;">
+            <div style="display:flex;white-space:nowrap;animation:crawl 24s linear infinite;will-change:transform;">
+              <span style="font-weight:700;color:#fdf6e3;font-size:19px;padding:0 40px;">عناوين الأخبار المتتالية تظهر في هذا الشريط المتحرك على مدار اليوم — راديو البلد FM 102.6 صوت البلد.</span>
+              <span style="font-weight:700;color:#fdf6e3;font-size:19px;padding:0 40px;">عناوين الأخبار المتتالية تظهر في هذا الشريط المتحرك على مدار اليوم — راديو البلد FM 102.6 صوت البلد.</span>
+            </div>
+          </div>
+          <div style="background:#f2d47e;display:flex;align-items:center;padding:0 20px;flex:none;"><span style="font-weight:900;color:#1b2326;font-size:20px;direction:ltr;">{{ clock }}</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= PART C : SOCIAL MEDIA ================= -->
+  <div style="font-family:'Tajawal',sans-serif;font-weight:800;font-size:20px;color:#1b2326;margin:58px 0 22px;display:flex;align-items:center;gap:12px;">
+    <span style="width:30px;height:3px;background:#f2d47e;"></span> عناصر السوشيال ميديا
+  </div>
+
+  <!-- profile + covers row -->
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:48px;">
+
+    <!-- profile picture -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">صورة الملف الشخصي · 320×320</div>
+      <div style="width:240px;height:240px;border-radius:50%;background:#1b2326;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 6px rgba(0,0,0,.12);border:5px solid #f2d47e;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <img src="assets/logo-white.png" style="height:96px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.5));">
+      </div>
+    </div>
+
+    <!-- facebook cover -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">غلاف فيسبوك · قلعة حلب + اللوغو · 851×315</div>
+      <div style="width:760px;height:282px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <!-- citadel photo placeholder -->
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#2a3236 0 16px,#242b2f 16px 32px);display:flex;align-items:center;justify-content:center;">
+          <span style="color:#56616a;font-family:monospace;font-size:13px;letter-spacing:1px;">ضع صورة قلعة حلب هنا</span>
+        </div>
+        <!-- dark blend gradient so logo merges -->
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,35,38,.96) 0%,rgba(27,35,38,.72) 38%,rgba(27,35,38,.30) 70%,rgba(27,35,38,.55) 100%);"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(0deg,rgba(27,35,38,.92),transparent);"></div>
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <!-- logo merged -->
+        <div style="position:absolute;right:54px;top:50%;transform:translateY(-50%);">
+          <img src="assets/logo-white.png" style="height:90px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.7));">
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px;color:#f2d47e;font-family:'Tajawal',sans-serif;font-weight:700;font-size:17px;">
+            <span style="width:24px;height:3px;background:#f2d47e;"></span> FM 102.6 · من قلب حلب
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- youtube / x header -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">غلاف يوتيوب / X · قلعة حلب + اللوغو · عريض</div>
+      <div style="width:760px;height:254px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#2a3236 0 16px,#242b2f 16px 32px);display:flex;align-items:center;justify-content:center;">
+          <span style="color:#56616a;font-family:monospace;font-size:13px;letter-spacing:1px;">ضع صورة قلعة حلب هنا</span>
+        </div>
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 55%, rgba(27,35,38,.45), rgba(27,35,38,.92) 78%);"></div>
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <img src="assets/logo-white.png" style="height:82px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.7));">
+          <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#f2d47e;font-size:18px;margin-top:14px;letter-spacing:1px;">FM 102.6 · من قلب حلب</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- feed posts row -->
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;margin-bottom:48px;">
+
+    <!-- square 1:1 -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">منشور مربّع · 1080×1080</div>
+      <div style="width:340px;height:340px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <div style="height:178px;background:repeating-linear-gradient(135deg,#2a3236 0 14px,#242b2f 14px 28px);display:flex;align-items:center;justify-content:center;color:#5d676b;font-family:monospace;font-size:12px;">ضع الصورة هنا</div>
+        <div style="padding:22px 24px;">
+          <div style="display:inline-block;background:#c1624c;color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:700;font-size:12px;padding:4px 12px;border-radius:4px;">منوّعات</div>
+          <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:27px;margin-top:12px;line-height:1.2;">عنوان المنشور هنا</div>
+          <img src="assets/logo-white.png" style="height:30px;margin-top:16px;opacity:.9;">
+        </div>
+      </div>
+    </div>
+
+    <!-- portrait 4:5 program promo -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">دعاية برنامج · عمودي 1080×1350</div>
+      <div style="width:300px;height:375px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <div style="height:215px;border-bottom:4px solid #f2d47e;background:repeating-linear-gradient(135deg,#2a3236 0 14px,#242b2f 14px 28px);display:flex;align-items:center;justify-content:center;color:#5d676b;font-family:monospace;font-size:12px;">صورة المذيع</div>
+        <div style="padding:22px 22px;">
+          <div style="display:inline-block;background:#b94126;color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:700;font-size:12px;padding:4px 12px;border-radius:4px;">برنامج جديد</div>
+          <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:28px;margin-top:12px;line-height:1.1;">اسم البرنامج</div>
+          <div style="color:#cfd6d8;font-family:'Cairo',sans-serif;font-size:14px;margin-top:8px;line-height:1.7;">وصف قصير للبرنامج وفكرته.</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:14px;color:#f2d47e;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;">
+            <span style="width:22px;height:3px;background:#f2d47e;"></span> كل ثلاثاء · 9 مساءً
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- story 9:16 -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">ستوري / ريل · 1080×1920</div>
+      <div style="width:222px;height:394px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#c1624c;position:relative;overflow:hidden;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <!-- safe zones hint -->
+        <div style="position:absolute;top:0;left:0;right:0;height:14%;border-bottom:1px dashed rgba(255,255,255,.25);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:20%;border-top:1px dashed rgba(255,255,255,.25);"></div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 22px;">
+          <div style="display:inline-flex;align-items:flex-end;">
+            <div style="background:#1b2326;border-radius:5px;padding:6px 9px;font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:12px;line-height:1.05;direction:ltr;">05.05<br>2026</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:46px;line-height:.9;padding-right:6px;">عَاجـل</div>
+          </div>
+          <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#fdf6e3;font-size:18px;margin-top:18px;line-height:1.5;">العنوان أو الخبر يُكتب هنا في المنتصف الآمن.</div>
+        </div>
+        <img src="assets/logo-white.png" style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);height:30px;">
+      </div>
+    </div>
+
+    <!-- youtube thumbnail 16:9 -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">صورة مصغّرة يوتيوب · 1280×720</div>
+      <div style="width:420px;height:236px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;display:flex;align-items:center;">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#2a3236 0 14px,#242b2f 14px 28px);"></div>
+        <div style="position:absolute;left:0;top:0;bottom:0;width:46%;background:linear-gradient(90deg,#1b2326 70%,transparent);"></div>
+        <div style="position:relative;padding:0 30px;max-width:62%;">
+          <div style="display:inline-block;background:#b94126;color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:800;font-size:13px;padding:4px 12px;border-radius:4px;">حلقة جديدة</div>
+          <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:30px;margin-top:10px;line-height:1.15;">عنوان الحلقة الجذّاب</div>
+          <img src="assets/logo-white.png" style="height:28px;margin-top:14px;">
+        </div>
+        <div style="position:absolute;left:18px;bottom:14px;width:46px;height:6px;background:#f2d47e;border-radius:3px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- guest announcement + schedule row -->
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+
+    <!-- guest announcement -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">إعلان ضيف الحلقة · 1080×1080</div>
+      <div style="width:340px;height:340px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <div style="padding:26px 26px 0;">
+          <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#f2d47e;font-size:15px;letter-spacing:1px;">ضيف الحلقة</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:18px;padding:16px 26px 0;">
+          <div style="flex:none;width:120px;height:120px;border-radius:50%;border:4px solid #f2d47e;background:repeating-linear-gradient(135deg,#2a3236 0 12px,#242b2f 12px 24px);display:flex;align-items:center;justify-content:center;color:#5d676b;font-family:monospace;font-size:11px;text-align:center;">صورة<br>الضيف</div>
+          <div style="padding-bottom:8px;">
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:25px;line-height:1.1;">اسم الضيف</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#c1624c;font-size:15px;margin-top:4px;">صفته / منصبه</div>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:#c1624c;padding:14px 26px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:'Tajawal',sans-serif;font-weight:800;color:#fdf6e3;font-size:15px;">الثلاثاء · 9:00 مساءً</span>
+          <img src="assets/logo-white.png" style="height:26px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- weekly schedule -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">جدول البرامج الأسبوعي · عمودي</div>
+      <div style="width:300px;height:480px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#fdf6e3;position:relative;overflow:hidden;">
+        <div style="background:#1b2326;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:22px;">جدول البرامج</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:13px;">هذا الأسبوع</div>
+          </div>
+          <img src="assets/logo-white.png" style="height:34px;">
+        </div>
+        <div style="padding:8px 22px;">
+          <sc-for list="{{ schedule }}" as="row" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #e4d8bd;">
+              <div>
+                <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#1b2326;font-size:16px;">{{ row.name }}</div>
+                <div style="font-family:'Tajawal',sans-serif;font-weight:600;color:#9a7a4a;font-size:12px;">{{ row.host }}</div>
+              </div>
+              <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#b94126;font-size:14px;direction:ltr;">{{ row.time }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- now on air -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">بطاقة «الآن على الهواء» · 1080×1080</div>
+      <div style="width:340px;height:340px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#c1624c;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="display:flex;align-items:center;gap:9px;background:#1b2326;border-radius:6px;padding:8px 18px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#f2d47e;animation:livepulse 1.4s infinite;"></span>
+          <span style="font-family:'Tajawal',sans-serif;font-weight:800;color:#fdf6e3;font-size:16px;letter-spacing:1px;">الآن على الهواء</span>
+        </div>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:34px;margin-top:22px;line-height:1.1;">اسم البرنامج</div>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#fdf6e3;font-size:16px;margin-top:8px;opacity:.85;">مع المذيع</div>
+        <img src="assets/logo-white.png" style="height:30px;margin-top:26px;">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= PART D : MORE SOCIAL ================= -->
+  <div style="font-family:'Tajawal',sans-serif;font-weight:800;font-size:20px;color:#1b2326;margin:58px 0 22px;display:flex;align-items:center;gap:12px;">
+    <span style="width:30px;height:3px;background:#f2d47e;"></span> قوالب إضافية للسوشيال ميديا
+  </div>
+
+  <!-- carousel row -->
+  <div style="margin-bottom:48px;">
+    <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">كاروسيل إنستغرام · شرائح متتابعة 1080×1080</div>
+    <div style="display:flex;gap:18px;align-items:flex-start;">
+      <!-- slide 1: cover -->
+      <div style="flex:none;width:300px;height:300px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <div style="display:inline-block;align-self:flex-start;background:#c1624c;color:#fdf6e3;font-family:'Tajawal',sans-serif;font-weight:700;font-size:12px;padding:4px 12px;border-radius:4px;">ملف</div>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:30px;margin-top:14px;line-height:1.2;">عنوان السلسلة الرئيسي</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:16px;color:#f2d47e;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;">اسحب <span style="font-size:18px;">←</span></div>
+        <img src="assets/logo-white.png" style="position:absolute;bottom:22px;right:30px;height:26px;">
+      </div>
+      <!-- slide 2: point -->
+      <div style="flex:none;width:300px;height:300px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#fdf6e3;position:relative;overflow:hidden;padding:30px;background-image:url(assets/pattern-brick.png);background-size:cover;background-position:center;">
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;font-size:64px;color:#c1624c;line-height:.8;">01</div>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#1b2326;font-size:22px;margin-top:14px;line-height:1.3;">عنوان النقطة الأولى</div>
+        <p style="font-family:'Cairo',sans-serif;color:#5b5346;font-size:14px;line-height:1.8;margin-top:10px;">شرح موجز للنقطة يُكتب هنا ضمن مساحة مريحة للقراءة.</p>
+        <span style="position:absolute;bottom:0;right:0;left:0;height:6px;background:#f2d47e;"></span>
+      </div>
+      <!-- slide 3: point -->
+      <div style="flex:none;width:300px;height:300px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#fdf6e3;position:relative;overflow:hidden;padding:30px;background-image:url(assets/pattern-brick.png);background-size:cover;background-position:center;">
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;font-size:64px;color:#c1624c;line-height:.8;">02</div>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#1b2326;font-size:22px;margin-top:14px;line-height:1.3;">عنوان النقطة الثانية</div>
+        <p style="font-family:'Cairo',sans-serif;color:#5b5346;font-size:14px;line-height:1.8;margin-top:10px;">شرح موجز للنقطة يُكتب هنا ضمن مساحة مريحة للقراءة.</p>
+        <span style="position:absolute;bottom:0;right:0;left:0;height:6px;background:#f2d47e;"></span>
+      </div>
+      <!-- slide 4: CTA -->
+      <div style="flex:none;width:300px;height:300px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#c1624c;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:26px;line-height:1.2;">تابعونا لمزيد من المحتوى</div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:16px;background:#1b2326;border-radius:6px;padding:9px 18px;color:#f2d47e;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;">@albald.fm</div>
+        <img src="assets/logo-white.png" style="height:32px;margin-top:20px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- audiogram + quote story + occasion + live frame row -->
+  <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+
+    <!-- audiogram -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">أوديوغرام بودكاست · 1080×1080</div>
+      <div style="width:340px;height:340px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;padding:28px;display:flex;flex-direction:column;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="flex:none;width:62px;height:62px;border-radius:8px;border:3px solid #f2d47e;background:repeating-linear-gradient(135deg,#2a3236 0 10px,#242b2f 10px 20px);"></div>
+          <div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:18px;">اسم البودكاست</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#f2d47e;font-size:13px;margin-top:2px;">الحلقة 12 · مع الضيف</div>
+          </div>
+        </div>
+        <p style="font-family:'Tajawal',sans-serif;font-weight:700;color:#fdf6e3;font-size:19px;line-height:1.7;margin:22px 0 auto;">«اقتباس مميّز من الحلقة يظهر هنا فوق موجة الصوت.»</p>
+        <!-- waveform -->
+        <div style="display:flex;align-items:flex-end;gap:4px;height:48px;">
+          <span style="flex:1;height:30%;background:#c1624c;border-radius:2px;"></span><span style="flex:1;height:60%;background:#f2d47e;border-radius:2px;"></span><span style="flex:1;height:90%;background:#c1624c;border-radius:2px;"></span><span style="flex:1;height:45%;background:#f2d47e;border-radius:2px;"></span><span style="flex:1;height:75%;background:#c1624c;border-radius:2px;"></span><span style="flex:1;height:100%;background:#f2d47e;border-radius:2px;"></span><span style="flex:1;height:55%;background:#c1624c;border-radius:2px;"></span><span style="flex:1;height:80%;background:#f2d47e;border-radius:2px;"></span><span style="flex:1;height:35%;background:#c1624c;border-radius:2px;"></span><span style="flex:1;height:65%;background:#f2d47e;border-radius:2px;"></span><span style="flex:1;height:50%;background:#c1624c;border-radius:2px;"></span><span style="flex:1;height:85%;background:#f2d47e;border-radius:2px;"></span><span style="flex:1;height:40%;background:#c1624c;border-radius:2px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- quote story 9:16 -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">اقتباس ستوري · 1080×1920</div>
+      <div style="width:222px;height:394px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#fdf6e3;position:relative;overflow:hidden;padding:34px 26px;display:flex;flex-direction:column;justify-content:center;background-image:url(assets/pattern-brick.png);background-size:cover;background-position:center;">
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;font-size:70px;color:#c1624c;line-height:.5;height:34px;">”</div>
+        <p style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:22px;line-height:1.6;color:#1b2326;margin:12px 0;">العبارة أو الاقتباس المميّز يُكتب هنا.</p>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:6px;">
+          <span style="width:30px;height:4px;background:#f2d47e;border-radius:2px;"></span>
+          <span style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;color:#b94126;">اسم الضيف</span>
+        </div>
+        <img src="assets/logo-main.png" style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);height:30px;opacity:.9;">
+      </div>
+    </div>
+
+    <!-- occasion / greeting -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">بطاقة مناسبة / تهنئة · 1080×1080</div>
+      <div style="width:340px;height:340px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#c1624c;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px;background-image:url(assets/pattern-soft.png);background-size:cover;background-position:center;">
+        <div style="position:absolute;top:0;right:0;left:0;height:7px;background:#f2d47e;"></div>
+        <span style="width:50px;height:5px;background:#f2d47e;border-radius:3px;margin-bottom:18px;"></span>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:38px;line-height:1.15;">كل عام وأنتم بخير</div>
+        <div style="font-family:'Tajawal',sans-serif;font-weight:700;color:#fdf6e3;font-size:16px;margin-top:12px;opacity:.9;">من أسرة راديو البلد</div>
+        <img src="assets/logo-white.png" style="height:34px;margin-top:24px;">
+      </div>
+    </div>
+
+    <!-- live coverage frame 9:16 -->
+    <div style="flex:none;">
+      <div style="font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;color:#6b6354;margin-bottom:10px;">إطار تغطية مباشرة · ستوري 1080×1920</div>
+      <div style="width:222px;height:394px;border-radius:2px;box-shadow:0 1px 6px rgba(0,0,0,.12);background:#1b2326;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#2a3236 0 14px,#242b2f 14px 28px);display:flex;align-items:center;justify-content:center;color:#56616a;font-family:monospace;font-size:11px;">صورة / فيديو التغطية</div>
+        <!-- live badge -->
+        <div style="position:absolute;top:18px;right:18px;display:flex;align-items:center;gap:7px;background:#b94126;border-radius:5px;padding:6px 12px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#fdf6e3;animation:livepulse 1.4s infinite;"></span>
+          <span style="font-family:'Tajawal',sans-serif;font-weight:800;color:#fdf6e3;font-size:13px;">مباشر</span>
+        </div>
+        <img src="assets/logo-white.png" style="position:absolute;top:16px;left:16px;height:26px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));">
+        <!-- bottom title -->
+        <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(0deg,rgba(27,35,38,.96),transparent);padding:40px 20px 24px;">
+          <div style="border-right:6px solid #f2d47e;padding-right:12px;">
+            <div style="font-family:'Tajawal',sans-serif;font-weight:800;color:#f2d47e;font-size:12px;letter-spacing:1px;">تغطية خاصة</div>
+            <div style="font-family:'Tajawal',sans-serif;font-weight:900;color:#fdf6e3;font-size:20px;margin-top:4px;line-height:1.3;">عنوان التغطية المباشرة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { clock: "20:00" };
+  componentDidMount() {
+    const tick = () => {
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      this.setState({ clock: hh + ":" + mm });
+    };
+    tick();
+    this._t = setInterval(tick, 1000 * 20);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+  renderVals() {
+    return {
+      clock: this.state.clock,
+      schedule: [
+        { name: "صباح البلد", host: "تقديم المذيع", time: "08:00" },
+        { name: "نشرة الأخبار", host: "غرفة الأخبار", time: "12:00" },
+        { name: "بين السطور", host: "تقديم المذيع", time: "16:00" },
+        { name: "ضيف وحكاية", host: "تقديم المذيع", time: "21:00" },
+        { name: "موسيقى البلد", host: "منوّعات", time: "23:00" }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "استوديو هوية راديو البلد",
+  "short_name": "راديو البلد",
+  "description": "استوديو الهوية البصرية لراديو البلد — تصميم المنشورات وعناصر البث",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1b2326",
+  "theme_color": "#1b2326",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

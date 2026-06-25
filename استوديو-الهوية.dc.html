@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1b2326">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="راديو البلد">
+<link rel="apple-touch-icon" href="icons/apple-touch.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;700;800;900&family=Reem+Kufi:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="image-slot.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;background:#cfc9bb;}
+  @keyframes crawl{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @keyframes livepulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .lab{font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:12px;color:#aeb6b8;display:block;margin-bottom:5px;}
+  .ic{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;padding:8px 10px;border-radius:7px;border:1px solid #3a4448;background:#222b2f;color:#fdf6e3;width:100%;}
+  .grp{background:#212a2e;border:1px solid #313b3f;border-radius:11px;padding:14px 15px;margin-bottom:12px;}
+  .grp h4{font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:13px;color:#f2d47e;margin:0 0 11px;}
+  .col{width:100%;height:34px;border:1px solid #3a4448;border-radius:7px;background:none;cursor:pointer;padding:2px;}
+  .rng{width:100%;accent-color:#c1624c;}
+  .btn{font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:14px;border:none;border-radius:9px;padding:10px 18px;cursor:pointer;}
+  .ck{display:flex;align-items:center;gap:8px;color:#fdf6e3;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:500;font-size:13px;cursor:pointer;}
+  .ck input{accent-color:#c1624c;width:16px;height:16px;}
+  image-slot{display:block;}
+</style>
+</helmet>
+<div dir="rtl" ref="{{ rootRef }}" style="--dark:#1b2326;--brick:#c1624c;--deep:#b94126;--cream:#fdf6e3;--gold:#f2d47e;--radius:0px;--barH:7px;--patURL:url(assets/pattern-soft.png);--patURLalt:url(assets/pattern-brick.png);--logoLight:url(assets/logo-white.png);--logoDark:url(assets/logo-main.png);--customLogo:url(assets/logo-white.png);--logoCur:url(assets/logo-brick.png);--ptopOp:0.9;--ptopSize:130%;--ptopY:0px;--pbotOp:0.9;--pbotSize:130%;--pbotY:0px;--pboxOp:0.5;--pboxSize:85%;--txtAlign:justify;--headScale:1;--txtPad:28px;--imgY:0px;--boxY:0px;--badgeY:0px;--dateTop:14%;--dateLeft:7%;--dateW:36%;--dateFs:11px;--bodyW:400;--fontHead:'IBM Plex Sans Arabic';--fontBody:'IBM Plex Sans Arabic';font-family:var(--fontBody),sans-serif;font-weight:var(--bodyW);min-height:100vh;">
+
+  <!-- ================= HOME ================= -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh;background:var(--dark);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
+      <div style="position:absolute;top:0;right:0;left:0;height:7px;background:var(--gold);"></div>
+      <button onClick="{{ openSettings }}" style="position:absolute;top:22px;left:22px;background:#2a3338;color:#f2d47e;border:1px solid #3a4448;border-radius:9px;width:42px;height:42px;font-size:19px;cursor:pointer;">⚙</button>
+      <div style="position:relative;width:229px;height:150px;background:var(--logoCur) center/contain no-repeat;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));"></div>
+      <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:42px;margin-top:30px;">استوديو الهوية البصرية</div>
+      <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:18px;margin-top:8px;letter-spacing:1px;">{{ fmLine }}</div>
+      <button onClick="{{ goPick }}" class="btn" style="position:relative;background:var(--brick);color:var(--cream);font-size:18px;padding:15px 46px;margin-top:38px;">اختر تصميماً ←</button>
+    </div>
+  </sc-if>
+
+  <!-- ================= PICK ================= -->
+  <sc-if value="{{ isPick }}" hint-placeholder-val="{{ false }}">
+    <div style="min-height:100vh;background:#e7e2d6;">
+      <div style="position:sticky;top:0;z-index:10;background:var(--dark);padding:16px 26px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--gold);">
+        <button onClick="{{ goHome }}" class="btn" style="background:#2a3338;color:#fdf6e3;font-size:14px;padding:9px 16px;">← الرئيسية</button>
+        <div style="width:52px;height:34px;background:var(--logoCur) center/contain no-repeat;"></div>
+        <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:19px;">اختر التصميم الذي تريد تعديله</div>
+        <button onClick="{{ openSettings }}" class="btn" style="margin-right:auto;background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 16px;">⚙ الإعدادات</button>
+      </div>
+      <div style="padding:34px 30px;display:flex;flex-wrap:wrap;gap:24px;">
+        <sc-for list="{{ designs }}" as="dz" hint-placeholder-count="0">
+          <div onClick="{{ dz.open }}" style="flex:none;width:210px;cursor:pointer;">
+            <div style="height:150px;border-radius:10px;overflow:hidden;background:var(--dark);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;">
+              <sc-if value="{{ dz.hasThumb }}">
+                <div style="{{ dz.thumbStyle }}"></div>
+              </sc-if>
+              <sc-if value="{{ dz.noThumb }}">
+                <div style="position:absolute;inset:0;background-image:var(--patURL);background-size:cover;opacity:.5;"></div>
+                <div style="position:relative;width:64px;height:42px;background:var(--logoCur) center/contain no-repeat;opacity:.92;"></div>
+              </sc-if>
+              <span style="position:absolute;top:0;right:0;left:0;height:5px;background:var(--gold);"></span>
+              <sc-if value="{{ dz.canDelete }}">
+                <span onClick="{{ dz.reset }}" title="حذف المنشور" style="position:absolute;top:9px;left:9px;width:26px;height:26px;border-radius:7px;background:rgba(185,65,38,.92);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;z-index:3;">🗑</span>
+              </sc-if>
+              <span style="position:absolute;bottom:8px;right:10px;font-family:var(--fontHead),sans-serif;font-weight:600;font-size:11px;color:var(--gold);background:rgba(0,0,0,.55);padding:3px 8px;border-radius:5px;">{{ dz.cat }}</span>
+            </div>
+            <div style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:14px;color:#1b2326;margin-top:9px;">{{ dz.name }}</div>
+          </div>
+        </sc-for>
+
+        <div onClick="{{ openBuilder }}" style="flex:none;width:210px;cursor:pointer;">
+          <div style="height:150px;border-radius:10px;border:2px dashed #b3a98f;background:#efeada;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#8a7f63;">
+            <span style="font-size:38px;line-height:1;">＋</span>
+            <span style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:13px;">تصميم جديد</span>
+          </div>
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:14px;color:#1b2326;margin-top:9px;">أنشئ تصميماً بمقاس وعناصر مخصّصة</div>
+        </div>
+        <sc-for list="{{ templates }}" as="tp" hint-placeholder-count="0">
+          <div style="flex:none;width:210px;">
+            <div onClick="{{ tp.open }}" style="height:150px;border-radius:10px;overflow:hidden;background:var(--dark);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <span style="position:absolute;top:0;right:0;left:0;height:5px;background:var(--gold);"></span>
+              <div style="width:80px;height:52px;background:var(--logoCur) center/contain no-repeat;"></div>
+              <span style="position:absolute;bottom:8px;right:10px;font-family:var(--fontHead),sans-serif;font-weight:700;font-size:11px;color:var(--gold);background:rgba(0,0,0,.35);padding:3px 8px;border-radius:5px;">قالب محفوظ</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px;"><span style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:14px;color:#1b2326;">{{ tp.name }}</span><span onClick="{{ tp.del }}" style="cursor:pointer;color:#b94126;font-size:13px;">حذف</span></div>
+          </div>
+        </sc-for>
+
+        <div onClick="{{ openGenerator }}" style="flex:none;width:210px;cursor:pointer;">
+          <div style="height:150px;border-radius:10px;border:2px solid var(--gold);background:linear-gradient(135deg,var(--dark) 0%,var(--brick) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+            <div style="font-size:36px;">🤖</div>
+            <div style="color:#fdf6e3;font-weight:700;font-size:13px;">مولّد</div>
+            <div style="color:#f2d47e;font-size:11px;">المنشورات</div>
+          </div>
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:14px;color:#1b2326;margin-top:9px;">اكتب الخبر وارفع صورة</div>
+        </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= EDIT ================= -->
+  <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+    <div style="min-height:100vh;background:#d6d0c3;display:flex;flex-direction:column;">
+      <div style="background:var(--dark);padding:13px 22px;display:flex;align-items:center;gap:12px;border-bottom:3px solid var(--gold);">
+        <button onClick="{{ goBack }}" class="btn" style="background:#2a3338;color:#fdf6e3;font-size:14px;padding:9px 15px;">→ التصاميم</button>
+        <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:18px;">{{ selName }}</div>
+        <button onClick="{{ openSettings }}" class="btn" style="margin-right:auto;background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">⚙ الإعدادات</button>
+        <button onClick="{{ saveTpl }}" class="btn" style="background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">★ حفظ كقالب</button>
+        <button onClick="{{ exportPng }}" class="btn" style="background:var(--brick);color:#fdf6e3;font-size:14px;padding:9px 20px;">⤓ حفظ بدقة عالية</button>
+      </div>
+      <div style="display:flex;flex:1;align-items:stretch;">
+        <div style="width:300px;flex:none;background:#1b2326;padding:18px 16px;overflow:auto;max-height:calc(100vh - 56px);">
+          <div class="grp">
+            <h4>الألوان</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div><span class="lab">داكن</span><input type="color" class="col" value="{{ t.dark }}" onInput="{{ onDark }}"></div>
+              <div><span class="lab">طوبي</span><input type="color" class="col" value="{{ t.brick }}" onInput="{{ onBrick }}"></div>
+              <div><span class="lab">أحمر</span><input type="color" class="col" value="{{ t.deep }}" onInput="{{ onDeep }}"></div>
+              <div><span class="lab">كريمي</span><input type="color" class="col" value="{{ t.cream }}" onInput="{{ onCream }}"></div>
+              <div><span class="lab">ذهبي</span><input type="color" class="col" value="{{ t.gold }}" onInput="{{ onGold }}"></div>
+            </div>
+          </div>
+          <div class="grp">
+            <h4>العناصر الظاهرة</h4>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <label class="ck"><input type="checkbox" checked="{{ showLogo }}" onChange="{{ onShowLogo }}"> إظهار اللوغو</label>
+              <label class="ck"><input type="checkbox" checked="{{ showFreq }}" onChange="{{ onShowFreq }}"> إظهار التردد / FM</label>
+              <label class="ck"><input type="checkbox" checked="{{ showPhoto }}" onChange="{{ onShowPhoto }}"> إظهار الصورة</label>
+            </div>
+          </div>
+          <div class="grp">
+            <h4>النقشة — تحكّم منفصل</h4>
+            <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:2px 0 6px;">▲ النقشة العلوية</div>
+            <span class="lab">الشدّة</span><input type="range" class="rng" min="0" max="2" step="0.05" value="{{ ptopOp }}" onInput="{{ onPtopOp }}">
+            <span class="lab" style="margin-top:7px;">الحجم</span><input type="range" class="rng" min="40" max="240" step="2" value="{{ ptopSize }}" onInput="{{ onPtopSize }}">
+            <span class="lab" style="margin-top:7px;">الموضع (عمودي)</span><input type="range" class="rng" min="-400" max="300" step="2" value="{{ ptopY }}" onInput="{{ onPtopY }}">
+            <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:13px 0 6px;">▼ النقشة السفلية</div>
+            <span class="lab">الشدّة</span><input type="range" class="rng" min="0" max="2" step="0.05" value="{{ pbotOp }}" onInput="{{ onPbotOp }}">
+            <span class="lab" style="margin-top:7px;">الحجم</span><input type="range" class="rng" min="40" max="240" step="2" value="{{ pbotSize }}" onInput="{{ onPbotSize }}">
+            <span class="lab" style="margin-top:7px;">الموضع (عمودي)</span><input type="range" class="rng" min="-400" max="300" step="2" value="{{ pbotY }}" onInput="{{ onPbotY }}">
+            <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:13px 0 6px;">▢ نقشة مربّع النص</div>
+            <span class="lab">الشدّة</span><input type="range" class="rng" min="0" max="2" step="0.05" value="{{ pboxOp }}" onInput="{{ onPboxOp }}">
+            <span class="lab" style="margin-top:7px;">الحجم</span><input type="range" class="rng" min="40" max="200" step="2" value="{{ pboxSize }}" onInput="{{ onPboxSize }}">
+            <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:13px 0 6px;">⬗ تدرّج/تلاشي النقشة</div>
+            <span class="lab">الاتجاه</span><select class="ic" value="{{ patFadeDir }}" onChange="{{ onPatFadeDir }}"><option value="bottom">تلاشٍ نحو الأسفل</option><option value="top">تلاشٍ نحو الأعلى</option></select>
+            <span class="lab" style="margin-top:7px;">شدّة التلاشي</span><input type="range" class="rng" min="0" max="1" step="0.05" value="{{ patFadeAmt }}" onInput="{{ onPatFadeAmt }}">
+            <hr style="border:none;border-top:1px solid #313b3f;margin:14px 0;">
+            <span class="lab">استدارة الزوايا</span><input type="range" class="rng" min="0" max="32" step="1" value="{{ radius }}" onInput="{{ onRadius }}">
+            <label class="ck" style="margin-top:12px;"><input type="checkbox" checked="{{ bar }}" onChange="{{ onBar }}"> الشريط الذهبي</label>
+          </div>
+          <div class="grp">
+            <h4>الخط</h4>
+            <select class="ic" value="{{ font }}" onChange="{{ onFont }}"><option value="plex">IBM Plex Sans Arabic</option><option value="cairo">Cairo + Tajawal</option><option value="tajawal">Tajawal</option><option value="reem">Reem Kufi + Cairo</option></select>
+            <label class="ck" style="margin-top:12px;"><input type="checkbox" checked="{{ bold }}" onChange="{{ onBold }}"> خط عريض (Bold)</label>
+          </div>
+          <div class="grp">
+            <h4>النصوص</h4>
+            <span class="lab">حجم النص</span><input type="range" class="rng" min="0.6" max="1.8" step="0.02" value="{{ headScale }}" onInput="{{ onHeadScale }}">
+            <span class="lab" style="margin-top:9px;">محاذاة النص</span><select class="ic" value="{{ txtAlign }}" onChange="{{ onTxtAlign }}"><option value="justify">ضبط (Justify)</option><option value="right">يمين</option><option value="center">وسط</option></select>
+            <span class="lab" style="margin-top:9px;">هوامش النص</span><input type="range" class="rng" min="6" max="80" step="1" value="{{ txtPad }}" onInput="{{ onTxtPad }}">
+            <span class="lab" style="margin-top:10px;">عنوان الخبر</span><input type="text" class="ic" value="{{ headline }}" onInput="{{ onHeadline }}">
+            <span class="lab" style="margin-top:10px;">الشريط المتحرك</span><input type="text" class="ic" value="{{ ticker }}" onInput="{{ onTicker }}">
+            <span class="lab" style="margin-top:10px;">اسم الضيف</span><input type="text" class="ic" value="{{ guest }}" onInput="{{ onGuest }}">
+            <span class="lab" style="margin-top:10px;">صفة الضيف</span><input type="text" class="ic" value="{{ guestTitle }}" onInput="{{ onGuestTitle }}">
+            <span class="lab" style="margin-top:10px;">اسم البرنامج</span><input type="text" class="ic" value="{{ program }}" onInput="{{ onProgram }}">
+            <span class="lab" style="margin-top:10px;">المذيع</span><input type="text" class="ic" value="{{ host }}" onInput="{{ onHost }}">
+            <span class="lab" style="margin-top:10px;">عنوان الأوديوغرام (الأعلى)</span><input type="text" class="ic" value="{{ agLabel }}" onInput="{{ onAgLabel }}">
+          </div>
+          <sc-if value="{{ isCarousel }}">
+            <div class="grp">
+              <h4>محتوى الشريحة الحالية</h4>
+              <span class="lab">عنوان الشريحة</span><input type="text" class="ic" value="{{ carHead }}" onInput="{{ onCarHead }}">
+              <span class="lab" style="margin-top:10px;">نص الشريحة</span><textarea class="ic" rows="3" style="resize:vertical;line-height:1.6;" value="{{ carBody }}" onInput="{{ onCarBody }}"></textarea>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isWeather }}">
+            <div class="grp">
+              <h4>بيانات الطقس</h4>
+              <span class="lab">المدينة</span><input type="text" class="ic" value="{{ wCity }}" onInput="{{ onWCity }}">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                <div><span class="lab">الحرارة</span><input type="text" class="ic" value="{{ wTemp }}" onInput="{{ onWTemp }}"></div>
+                <div><span class="lab">الأيقونة</span><input type="text" class="ic" value="{{ wIcon }}" onInput="{{ onWIcon }}" placeholder="☀ ☁ ⛅ 🌧"></div>
+                <div><span class="lab">الصغرى</span><input type="text" class="ic" value="{{ wLo }}" onInput="{{ onWLo }}"></div>
+                <div><span class="lab">الكبرى</span><input type="text" class="ic" value="{{ wHi }}" onInput="{{ onWHi }}"></div>
+              </div>
+              <span class="lab" style="margin-top:10px;">الحالة</span><input type="text" class="ic" value="{{ wCond }}" onInput="{{ onWCond }}">
+            </div>
+          </sc-if>
+          <sc-if value="{{ isMatch }}">
+            <div class="grp">
+              <h4>بيانات المباراة</h4>
+              <span class="lab">البطولة</span><input type="text" class="ic" value="{{ mLeague }}" onInput="{{ onMLeague }}">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                <div><span class="lab">الفريق الأول</span><input type="text" class="ic" value="{{ mTeamA }}" onInput="{{ onMTeamA }}"></div>
+                <div><span class="lab">الفريق الثاني</span><input type="text" class="ic" value="{{ mTeamB }}" onInput="{{ onMTeamB }}"></div>
+                <div><span class="lab">نتيجة الأول</span><input type="text" class="ic" value="{{ mScoreA }}" onInput="{{ onMScoreA }}"></div>
+                <div><span class="lab">نتيجة الثاني</span><input type="text" class="ic" value="{{ mScoreB }}" onInput="{{ onMScoreB }}"></div>
+              </div>
+              <span class="lab" style="margin-top:10px;">الحالة</span><input type="text" class="ic" value="{{ mStatus }}" onInput="{{ onMStatus }}">
+            </div>
+          </sc-if>
+          <sc-if value="{{ isBroadcast }}">
+            <div class="grp">
+              <h4>عناصر البث</h4>
+              <span class="lab">عنوان شريط الأخبار</span><input type="text" class="ic" value="{{ tickerLabel }}" onInput="{{ onTickerLabel }}" placeholder="عاجل / أخبار / رياضة">
+              <label class="ck" style="margin-top:12px;"><input type="checkbox" checked="{{ showRerun }}" onChange="{{ onShowRerun }}"> شارة «إعادة»</label>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isSchedule }}">
+            <div class="grp">
+              <h4>برامج الجدول</h4>
+              <sc-for list="{{ scheduleRows }}" as="r" hint-placeholder-count="5">
+                <div style="border:1px solid #313b3f;border-radius:9px;padding:9px;margin-bottom:9px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;"><span class="lab" style="margin:0;">برنامج {{ r.n }}</span><span onClick="{{ r.del }}" style="cursor:pointer;color:#b94126;font-size:12px;">حذف</span></div>
+                  <input type="text" class="ic" value="{{ r.name }}" onInput="{{ r.onName }}" placeholder="اسم البرنامج">
+                  <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:7px;">
+                    <input type="text" class="ic" value="{{ r.host }}" onInput="{{ r.onHost }}" placeholder="المذيع">
+                    <input type="text" class="ic" value="{{ r.time }}" onInput="{{ r.onTime }}" placeholder="08:00" style="direction:ltr;text-align:center;">
+                  </div>
+                </div>
+              </sc-for>
+              <button onClick="{{ schedAdd }}" class="btn" style="width:100%;background:#26312f;color:#f2d47e;border:1px solid #34403d;">＋ أضف برنامجاً</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasPhoto }}">
+            <div class="grp">
+              <h4>الصورة</h4>
+              <div style="display:flex;gap:8px;">
+                <button onClick="{{ slotReplace }}" class="btn" style="flex:1;background:#26312f;color:#f2d47e;border:1px solid #34403d;">⟳ استبدال</button>
+                <button onClick="{{ slotClear }}" class="btn" style="flex:1;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">🗑 حذف</button>
+              </div>
+              <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:9px;">💡 الإطار ثابت — لتكبير الصورة أو تحريكها داخله: <b style="color:#cfd6d8;">انقر مرتين</b> على الصورة ثم اسحبها أو اسحب الزوايا. الإطار لا يتحرك.</div>
+              <span class="lab" style="margin-top:12px;">حجم الإطار (×{{ imgScale }})</span><input type="range" class="rng" min="0.5" max="2" step="0.05" value="{{ imgScale }}" onInput="{{ onImgScale }}">
+            </div>
+          </sc-if>
+          <sc-if value="{{ isCustomSel }}">
+            <div class="grp">
+              <h4>الصورة المحددة</h4>
+              <sc-if value="{{ hasSelPng }}">
+                <span class="lab">حجم صورة {{ selPngNum }} (×{{ selPngScale }})</span>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                  <button onClick="{{ selPngSmaller }}" class="btn" style="background:#2a3338;color:#f2d47e;padding:5px 13px;font-size:16px;">−</button>
+                  <input type="range" class="rng" style="flex:1;" min="0.2" max="4" step="0.05" value="{{ selPngScale }}" onInput="{{ onSelPngScale }}">
+                  <button onClick="{{ selPngBigger }}" class="btn" style="background:#2a3338;color:#f2d47e;padding:5px 13px;font-size:16px;">＋</button>
+                </div>
+                <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.6;margin-top:8px;">اسحب الصورة لتحريكها · هذا الشريط أو عجلة الماوس فوقها للتكبير/التصغير.</div>
+              </sc-if>
+              <sc-if value="{{ noSelPng }}">
+                <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;color:#8a9295;line-height:1.7;">انقر على أي صورة مرفقة في التصميم لتحديدها، ثم كبّرها أو صغّرها من هنا.</div>
+              </sc-if>
+            </div>
+            <div class="grp">
+              <h4>الطبقات (الأعلى فوق)</h4>
+              <sc-for list="{{ layerList }}" as="ly" hint-placeholder-count="3">
+                <div style="padding:7px 9px;margin-bottom:7px;border:1px solid #313b3f;border-radius:8px;background:#222b2e;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="flex:1;color:#cfd6d8;font-size:13px;font-family:'IBM Plex Sans Arabic',sans-serif;">{{ ly.name }}</span>
+                    <button onClick="{{ ly.up }}" class="btn" style="background:#2a3338;color:#f2d47e;padding:4px 10px;font-size:13px;" title="لأعلى">▲</button>
+                    <button onClick="{{ ly.down }}" class="btn" style="background:#2a3338;color:#f2d47e;padding:4px 10px;font-size:13px;" title="لأسفل">▼</button>
+                  </div>
+                  <sc-if value="{{ ly.isImg }}">
+                    <button onClick="{{ ly.toggleFit }}" class="btn" style="width:100%;margin-top:7px;background:#26312f;color:#f2d47e;border:1px solid #34403d;font-size:12px;">طريقة العرض: {{ ly.fitLabel }} ⇄</button>
+                  </sc-if>
+                  <sc-if value="{{ ly.resizable }}">
+                    <div style="display:flex;align-items:center;gap:7px;margin-top:7px;">
+                      <button onClick="{{ ly.smaller }}" class="btn" style="background:#2a3338;color:#f2d47e;padding:3px 11px;font-size:15px;">−</button>
+                      <input type="range" class="rng" style="flex:1;" min="0.2" max="4" step="0.05" value="{{ ly.scale }}" onInput="{{ ly.onScale }}">
+                      <button onClick="{{ ly.bigger }}" class="btn" style="background:#2a3338;color:#f2d47e;padding:3px 11px;font-size:15px;">＋</button>
+                      <sc-if value="{{ ly.isPng }}"><span onClick="{{ ly.del }}" style="cursor:pointer;color:#b94126;font-size:12px;font-family:'IBM Plex Sans Arabic',sans-serif;">حذف</span></sc-if>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.6;margin-top:4px;">العنصر في الأعلى يظهر فوق البقية. للصور: حرّك المؤشّر لتغيير الحجم.</div>
+            </div>
+          </sc-if>
+          <div class="grp">
+            <h4>المواضع (لأعلى / لأسفل)</h4>
+            <span class="lab" style="margin-top:8px;">موضع النص</span><input type="range" class="rng" min="-220" max="220" step="2" value="{{ boxY }}" onInput="{{ onBoxY }}">
+            <span class="lab" style="margin-top:8px;">موضع شارة العاجل</span><input type="range" class="rng" min="-180" max="180" step="2" value="{{ badgeY }}" onInput="{{ onBadgeY }}">
+          </div>
+          <div class="grp">
+            <h4>خيارات التصدير</h4>
+            <span class="lab">جودة التصدير (×{{ exportScale }})</span><input type="range" class="rng" min="2" max="5" step="0.5" value="{{ exportScale }}" onInput="{{ onExportScale }}">
+            <label class="ck" style="margin-top:12px;"><input type="checkbox" checked="{{ exportTransparent }}" onChange="{{ onExportTransparent }}"> خلفية شفافة (PNG)</label>
+          </div>
+          <button onClick="{{ resetAll }}" class="btn" style="width:100%;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">استعادة الافتراضي</button>
+        </div>
+
+        <div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:40px;">
+
+          <sc-if value="{{ d.breaking_photo }}">
+            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
+              <sc-if value="{{ showPhoto }}"><image-slot id="bp_photo" style="width:100%;height:calc(258px * var(--imgScale));" shape="rect" placeholder="اسحب صورة الخبر"></image-slot></sc-if>
+              <div style="position:absolute;top:238px;right:22px;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:64px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div>
+              <p style="position:relative;padding:30px var(--txtPad) 0;font-family:var(--fontBody),sans-serif;color:var(--cream);font-size:calc(19px*var(--headScale));line-height:1.95;margin:0;text-align:var(--txtAlign);text-justify:inter-word;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
+              <sc-if value="{{ showFreq }}"><div data-mv="fm" style="position:absolute;transform:translate(var(--fmX),var(--fmY)) scale(var(--fmS));cursor:move;left:24px;bottom:20px;width:58px;height:36px;background:var(--fmCur) center/contain no-repeat;"></div></sc-if>
+              <sc-if value="{{ showLogo }}"><div style="position:absolute;right:24px;bottom:18px;width:55px;height:36px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.breaking_text }}">
+            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:26px;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
+              <div style="position:relative;width:fit-content;margin:0 auto 18px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:56px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div>
+              <div style="position:relative;background:var(--cream);border-radius:16px;padding:24px var(--txtPad);min-height:285px;overflow:hidden;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">
+                <div style="position:absolute;inset:0;background-image:var(--patURLalt);background-repeat:no-repeat;background-position:center;background-size:var(--pboxSize);opacity:var(--pboxOp);pointer-events:none;"></div>
+                <p style="position:relative;font-family:var(--fontBody),sans-serif;color:var(--dark);font-size:calc(18px*var(--headScale));line-height:1.95;margin:0;text-align:var(--txtAlign);text-justify:inter-word;">{{ headline }}</p>
+              </div>
+              <sc-if value="{{ showFreq }}"><div data-mv="fm" style="position:absolute;transform:translate(var(--fmX),var(--fmY)) scale(var(--fmS));cursor:move;left:24px;bottom:20px;width:55px;height:34px;background:var(--fmCur) center/contain no-repeat;"></div></sc-if>
+              <sc-if value="{{ showLogo }}"><div style="position:absolute;right:24px;bottom:18px;width:52px;height:34px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.text_photo }}">
+            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
+              <sc-if value="{{ showPhoto }}"><image-slot id="tp_photo" style="position:relative;display:block;width:calc(100% - 96px);height:calc(250px * var(--imgScale));margin:0 48px 0;border-bottom:3px solid var(--gold);" shape="rect" placeholder="اسحب الصورة"></image-slot></sc-if>
+              <p style="position:relative;font-family:var(--fontBody),sans-serif;color:var(--cream);font-size:calc(18px*var(--headScale));line-height:1.95;margin:24px 0 0;padding:0 48px;text-align:var(--txtAlign);text-justify:inter-word;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
+              <sc-if value="{{ showFreq }}"><div data-mv="fm" style="position:absolute;transform:translate(var(--fmX),var(--fmY)) scale(var(--fmS));cursor:move;left:48px;bottom:20px;width:55px;height:34px;background:var(--fmCur) center/contain no-repeat;"></div></sc-if>
+              <sc-if value="{{ showLogo }}"><div style="position:absolute;right:48px;bottom:18px;width:52px;height:34px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.quote }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--cream);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:42px 38px;display:flex;flex-direction:column;justify-content:center;">
+              <div style="position:absolute;inset:0;background-image:var(--patURLalt);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;font-size:90px;color:var(--brick);line-height:.5;height:46px;">”</div>
+              <p style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:600;font-size:30px;line-height:1.6;color:var(--dark);margin:14px 0;">{{ headline }}</p>
+              <div style="position:relative;display:flex;align-items:center;gap:11px;">
+                <span style="width:38px;height:4px;background:var(--gold);border-radius:2px;"></span>
+                <span style="font-family:var(--fontHead),sans-serif;font-weight:600;font-size:17px;color:var(--deep);">{{ guest }} · {{ guestTitle }}</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.square }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);z-index:2;"></div></sc-if>
+              <sc-if value="{{ showPhoto }}"><image-slot id="sq_photo" style="width:100%;height:calc(226px * var(--imgScale));" shape="rect" placeholder="اسحب الصورة"></image-slot></sc-if>
+              <div style="padding:26px 28px;position:relative;">
+                <div style="display:inline-block;background:var(--brick);color:var(--cream);font-family:var(--fontHead),sans-serif;font-weight:600;font-size:14px;padding:5px 15px;border-radius:5px;">منوّعات</div>
+                <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:31px;margin-top:14px;line-height:1.2;">{{ headline }}</div>
+                <sc-if value="{{ showLogo }}"><div style="width:52px;height:34px;margin-top:18px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.story }}">
+            <div data-export-node="1" data-w="1080" data-h="1920" style="width:250px;height:444px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <sc-if value="{{ showPhoto }}"><image-slot id="st_photo" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب خلفية (اختياري)"></image-slot></sc-if>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 26px;pointer-events:none;">
+                <div style="position:relative;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:52px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div>
+                <div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:calc(19px*var(--headScale));margin-top:20px;line-height:1.5;text-shadow:0 2px 6px rgba(0,0,0,.4);transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;text-align:var(--txtAlign);" data-mv="box">{{ headline }}</div>
+              </div>
+              <sc-if value="{{ showLogo }}"><div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:46px;height:30px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.full_screen }}">
+            <div data-export-node="1" data-w="1920" data-h="1080" style="width:900px;height:506px;border-radius:var(--radius);overflow:hidden;position:relative;background:var(--dark);box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <sc-if value="{{ showPhoto }}"><image-slot id="fs_video" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب خلفية البث"></image-slot></sc-if>
+              <sc-if value="{{ showLogo }}"><div style="position:absolute;top:20px;right:24px;width:70px;height:46px;background:var(--logoCur) center/contain no-repeat;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));"></div></sc-if>
+              <div style="position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:10px;">
+                <div style="display:flex;align-items:center;gap:8px;background:var(--deep);border-radius:5px;padding:6px 13px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--cream);animation:livepulse 1.4s infinite;"></span><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:14px;">مباشر</span></div>
+                <sc-if value="{{ showRerun }}"><div style="background:var(--gold);border-radius:5px;padding:6px 13px;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--dark);font-size:14px;">إعادة</div></sc-if>
+              </div>
+              <div style="position:absolute;right:30px;bottom:106px;display:flex;align-items:stretch;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.5);transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box"><div style="width:8px;background:var(--gold);"></div><div style="background:rgba(27,35,38,.92);padding:12px 24px;"><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:24px;">{{ guest }}</div><div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:14px;margin-top:2px;">{{ guestTitle }}</div></div></div>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:78px;display:flex;align-items:stretch;"><div style="background:var(--deep);display:flex;align-items:center;padding:0 20px;"><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:19px;">{{ tickerLabel }}</span></div><div style="flex:1;background:rgba(27,35,38,.94);overflow:hidden;display:flex;align-items:center;border-top:3px solid var(--gold);"><div style="display:flex;white-space:nowrap;animation:crawl 26s linear infinite;"><span style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:18px;padding:0 38px;">{{ ticker }}</span><span style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:18px;padding:0 38px;">{{ ticker }}</span></div></div><div style="background:var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 18px;"><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--dark);font-size:21px;direction:ltr;">{{ clock }}</span><sc-if value="{{ showFreq }}"><span style="font-family:var(--fontHead),sans-serif;font-weight:600;color:#7a5a2a;font-size:10px;">FM 102.6</span></sc-if></div></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.fb_cover }}">
+            <div data-export-node="1" data-w="1640" data-h="608" style="width:800px;height:297px;border-radius:var(--radius);overflow:hidden;position:relative;background:var(--dark);box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <sc-if value="{{ showPhoto }}"><image-slot id="fb_citadel" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب صورة قلعة حلب"></image-slot></sc-if>
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,35,38,.95) 0%,rgba(27,35,38,.55) 45%,rgba(27,35,38,.22) 100%);"></div>
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
+              <div style="position:absolute;right:48px;top:50%;transform:translateY(-50%);">
+                <sc-if value="{{ showLogo }}"><div style="width:141px;height:92px;background:var(--logoCur) center/contain no-repeat;filter:drop-shadow(0 4px 12px rgba(0,0,0,.7));"></div></sc-if>
+                <sc-if value="{{ showFreq }}"><div style="display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--gold);font-family:var(--fontHead),sans-serif;font-weight:600;font-size:17px;"><span style="width:24px;height:3px;background:var(--gold);"></span> {{ fmLine }}</div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.schedule }}">
+            <div data-export-node="1" data-w="1080" data-h="1620" style="width:320px;height:480px;border-radius:var(--radius);overflow:hidden;background:var(--cream);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="background:var(--dark);padding:22px 24px;display:flex;align-items:center;justify-content:space-between;"><div><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:22px;">جدول البرامج</div><div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:12px;">هذا الأسبوع</div></div><sc-if value="{{ showLogo }}"><div style="width:52px;height:34px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if></div>
+              <div style="padding:6px 24px;">
+                <sc-for list="{{ schedule }}" as="row" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #e4d8bd;"><div><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--dark);font-size:16px;">{{ row.name }}</div><div style="font-family:var(--fontHead),sans-serif;font-weight:500;color:#9a7a4a;font-size:11px;">{{ row.host }}</div></div><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--deep);font-size:14px;direction:ltr;">{{ row.time }}</div></div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.now_air }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 36px;">
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
+              <div style="position:relative;display:flex;align-items:center;gap:9px;background:var(--dark);border-radius:6px;padding:9px 19px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);animation:livepulse 1.4s infinite;"></span><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:16px;">الآن على الهواء</span></div>
+              <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:38px;margin-top:24px;line-height:1.1;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ program }}</div>
+              <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:17px;margin-top:9px;opacity:.85;">{{ host }}</div>
+              <sc-if value="{{ showLogo }}"><div style="position:relative;width:49px;height:32px;background:var(--logoCur) center/contain no-repeat;margin-top:26px;"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.quote_deco }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:46px 40px;display:flex;flex-direction:column;justify-content:center;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:60%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;inset:18px;border:2px solid var(--gold);border-radius:14px;pointer-events:none;opacity:.55;"></div>
+              <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;font-size:110px;color:var(--gold);line-height:.45;height:52px;text-align:center;">”</div>
+              <p style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;font-size:30px;line-height:1.65;color:var(--cream);margin:20px 0;text-align:center;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
+              <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <span style="width:54px;height:3px;background:var(--gold);border-radius:2px;"></span>
+                <span style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:19px;color:var(--gold);">{{ guest }}</span>
+                <span style="font-family:var(--fontHead),sans-serif;font-weight:500;font-size:14px;color:var(--cream);opacity:.8;">{{ guestTitle }}</span>
+              </div>
+              <sc-if value="{{ showLogo }}"><div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:48px;height:31px;background:var(--logoCur) center/contain no-repeat;opacity:.9;"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.carousel }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+              <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:{{ carBg }};position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:44px 40px;display:flex;flex-direction:column;justify-content:center;">
+                <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+                <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
+                <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--gold);font-size:15px;">{{ carNum }}</div>
+                <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:34px;line-height:1.25;margin-top:14px;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ carHead }}</div>
+                <p style="position:relative;font-family:var(--fontBody),sans-serif;color:var(--cream);font-size:18px;line-height:1.9;margin:16px 0 0;opacity:.92;text-align:var(--txtAlign);">{{ carBody }}</p>
+                <div style="position:absolute;bottom:24px;right:40px;left:40px;display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;gap:7px;">
+                    <sc-for list="{{ carDots }}" as="dot" hint-placeholder-count="4"><span style="width:9px;height:9px;border-radius:50%;background:{{ dot.c }};"></span></sc-for>
+                  </div>
+                  <sc-if value="{{ showLogo }}"><div style="width:46px;height:30px;background:var(--logoCur) center/contain no-repeat;"></div></sc-if>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;background:#1b2326;border:1px solid #313b3f;border-radius:10px;padding:8px 12px;">
+                <button onClick="{{ carPrev }}" class="btn" style="background:#2a3338;color:#fdf6e3;padding:7px 14px;">←</button>
+                <span style="font-family:var(--fontHead),sans-serif;font-weight:600;color:#9aa2a4;font-size:13px;">شريحة {{ carPos }}</span>
+                <button onClick="{{ carNext }}" class="btn" style="background:#2a3338;color:#fdf6e3;padding:7px 14px;">→</button>
+                <button onClick="{{ carAdd }}" class="btn" style="background:#26312f;color:#f2d47e;padding:7px 12px;">＋ شريحة</button>
+                <button onClick="{{ carDel }}" class="btn" style="background:#3a2420;color:#f2d47e;padding:7px 12px;">حذف</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.weather }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:linear-gradient(160deg,var(--dark) 0%,var(--brick) 130%);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:38px 36px;display:flex;flex-direction:column;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:55%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--gold);font-size:14px;">حالة الطقس</div>
+                  <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:30px;margin-top:3px;">{{ wCity }}</div>
+                </div>
+                <sc-if value="{{ showLogo }}"><div style="width:54px;height:35px;background:var(--logoCur) center/contain no-repeat;"></div></sc-if>
+              </div>
+              <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;gap:18px;">
+                <div style="font-size:96px;line-height:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3));">{{ wIcon }}</div>
+                <div style="text-align:center;">
+                  <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:78px;line-height:.9;direction:ltr;">{{ wTemp }}°</div>
+                  <div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:17px;margin-top:6px;">{{ wCond }}</div>
+                </div>
+              </div>
+              <div style="position:relative;display:flex;justify-content:center;gap:26px;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:16px;">
+                <span>الصغرى <span style="color:var(--gold);direction:ltr;">{{ wLo }}°</span></span>
+                <span>الكبرى <span style="color:var(--gold);direction:ltr;">{{ wHi }}°</span></span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.match }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:34px 30px;display:flex;flex-direction:column;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:50%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
+              <div style="position:relative;text-align:center;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--gold);font-size:16px;">{{ mLeague }}</div>
+              <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;">
+                <div style="flex:1;text-align:center;"><div style="width:74px;height:74px;margin:0 auto 12px;border-radius:50%;background:var(--brick);display:flex;align-items:center;justify-content:center;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:30px;">{{ mInitA }}</div><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:18px;">{{ mTeamA }}</div></div>
+                <div style="text-align:center;"><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:52px;line-height:1;direction:ltr;">{{ mScoreA }} <span style="color:var(--gold);">·</span> {{ mScoreB }}</div><div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:13px;margin-top:8px;">{{ mStatus }}</div></div>
+                <div style="flex:1;text-align:center;"><div style="width:74px;height:74px;margin:0 auto 12px;border-radius:50%;background:var(--deep);display:flex;align-items:center;justify-content:center;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:30px;">{{ mInitB }}</div><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:18px;">{{ mTeamB }}</div></div>
+              </div>
+              <sc-if value="{{ showLogo }}"><div style="position:relative;width:50px;height:33px;margin:0 auto;background:var(--logoCur) center/contain no-repeat;"></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.audiogram }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:34px 32px;display:flex;flex-direction:column;">
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:relative;display:flex;align-items:center;gap:9px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);animation:livepulse 1.4s infinite;"></span><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:15px;">{{ agLabel }}</span></div>
+              <div style="position:relative;display:flex;align-items:center;gap:16px;margin-top:22px;">
+                <sc-if value="{{ showPhoto }}"><image-slot id="ag_photo" style="width:calc(96px * var(--imgScale));height:calc(96px * var(--imgScale));flex:none;" shape="circle" placeholder="صورة الضيف"></image-slot></sc-if>
+                <div><div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:22px;">{{ guest }}</div><div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:14px;margin-top:3px;">{{ guestTitle }}</div></div>
+              </div>
+              <p style="position:relative;flex:1;display:flex;align-items:center;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:24px;line-height:1.55;margin:18px 0;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
+              <div style="position:relative;display:flex;align-items:flex-end;gap:4px;height:46px;">
+                <sc-for list="{{ waveBars }}" as="wb" hint-placeholder-count="40"><span style="flex:1;background:var(--gold);border-radius:2px;height:{{ wb.h }}%;opacity:.9;"></span></sc-for>
+              </div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;margin-top:14px;"><div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:13px;opacity:.85;">{{ program }}</div><sc-if value="{{ showLogo }}"><div style="width:48px;height:31px;background:var(--logoCur) center/contain no-repeat;"></div></sc-if></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.custom }}">
+            <div data-export-node="1" data-w="{{ cfg.w }}" data-h="{{ cfg.h }}" style="width:{{ cfg.dispW }}px;height:{{ cfg.dispH }}px;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);background:{{ cfg.bgColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;">
+              <sc-if value="{{ cfg.showImg }}"><image-slot id="custom_photo" fit="{{ cfg.imgFit }}" style="position:absolute;inset:0;width:100%;height:100%;z-index:{{ cfg.zImage }};transform:scale(var(--cimgS));transform-origin:center;" shape="rect" placeholder="اسحب الصورة"></image-slot></sc-if>
+              <sc-if value="{{ cfg.showImg }}"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.45),transparent 55%);pointer-events:none;z-index:{{ cfg.zImage }};"></div></sc-if>
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
+              <sc-if value="{{ cfg.showBadge }}"><div style="position:relative;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));margin-bottom:18px;z-index:{{ cfg.zBadge }};"><img src="assets/badge-aajel-plain.png" style="height:58px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div></sc-if>
+              <sc-for list="{{ cfg.pngsR }}" as="pg" hint-placeholder-count="0"><div data-pidx="{{ pg.i }}" style="position:absolute;left:50%;top:42%;margin-left:{{ pg.x }}px;margin-top:{{ pg.y }}px;width:{{ pg.w }}px;transform:translate(-50%,-50%);z-index:{{ pg.z }};outline:{{ pg.outline }};outline-offset:3px;cursor:move;"><div style="{{ pg.imgStyle }}"></div><sc-if value="{{ pg.selected }}"><span data-presize="{{ pg.i }}" style="position:absolute;left:-7px;top:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;"></span><span data-presize="{{ pg.i }}" style="position:absolute;right:-7px;top:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;"></span><span data-presize="{{ pg.i }}" style="position:absolute;left:-7px;bottom:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;"></span><span data-presize="{{ pg.i }}" style="position:absolute;right:-7px;bottom:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;"></span></sc-if></div></sc-for>
+              <sc-if value="{{ cfg.showText }}"><div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:{{ cfg.fgColor }};font-size:30px;line-height:1.4;text-shadow:0 2px 8px rgba(0,0,0,.35);z-index:{{ cfg.zText }};">{{ headline }}</div></sc-if>
+              <sc-if value="{{ cfg.showLogo }}"><div data-mv="logo" style="position:relative;width:55px;height:36px;background:var(--customLogo) center/contain no-repeat;margin-top:22px;z-index:{{ cfg.zLogo }};transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;"></div></sc-if>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= SETTINGS ================= -->
+  <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;background:rgba(10,14,16,.6);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="background:#1b2326;border:1px solid #313b3f;border-radius:16px;padding:26px;width:460px;max-width:100%;max-height:90vh;overflow:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:20px;">الإعدادات العامة</div>
+          <button onClick="{{ closeSettings }}" class="btn" style="background:#2a3338;color:#fdf6e3;padding:7px 14px;">✕</button>
+        </div>
+        <div class="grp">
+          <h4>الشعار (يُطبّق على كل التصاميم)</h4>
+          <span class="lab">اللوغو الأبيض — للخلفيات الطوبية والملوّنة</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--brick);border-radius:8px;padding:10px;"><div style="width:52px;height:34px;background:var(--logoWhite) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoWhite }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <span class="lab">اللوغو الطوبي — للخلفيات الداكنة</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--dark);border-radius:8px;padding:10px;"><div style="width:52px;height:34px;background:var(--logoLight) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoLight }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <span class="lab">اللوغو الأساسي (غامق) — للخلفيات الفاتحة</span>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="background:var(--cream);border-radius:8px;padding:10px;"><div style="width:52px;height:34px;background:var(--logoDark) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoDark }}" style="color:#cfd6d8;font-size:12px;"></div>
+        </div>
+        <div class="grp">
+          <h4>لوغو التردد (FM) — يُطبّق على الكل</h4>
+          <span class="lab">الأبيض — للخلفيات الطوبية والملوّنة</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--brick);border-radius:8px;padding:10px;"><div style="width:46px;height:30px;background:var(--fmWhite) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmWhite }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <span class="lab">الطوبي — للخلفيات الداكنة</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--dark);border-radius:8px;padding:10px;"><div style="width:46px;height:30px;background:var(--fmBrick) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmBrick }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <span class="lab">الأساسي (غامق) — للخلفيات الفاتحة</span>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="background:var(--cream);border-radius:8px;padding:10px;"><div style="width:46px;height:30px;background:var(--fmDark) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmDark }}" style="color:#cfd6d8;font-size:12px;"></div>
+        </div>
+        <div class="grp">
+          <h4>عمق بصري (تدرّج)</h4>
+          <label class="ck"><input type="checkbox" checked="{{ gradBg }}" onChange="{{ onGradBg }}"> خلفية متدرّجة للتصاميم الداكنة والملوّنة</label>
+          <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:8px;">يضيف لمسة عمق ناعمة على الخلفية في كل التصاميم. (تدرّج النقشة يُضبط من لوحة التحرير اليمنى لكل تصميم.)</div>
+        </div>
+        <div class="grp">
+          <h4>النقشة المخصّصة</h4>
+          <span class="lab">ارفع صورة نقشة (PNG شفاف) لتُطبّق على الكل</span>
+          <input type="file" accept="image/*" onChange="{{ onPatternFile }}" style="color:#cfd6d8;font-size:12px;">
+        </div>
+        <div class="grp">
+          <h4>النصوص الثابتة</h4>
+          <span class="lab">سطر التردد</span><input type="text" class="ic" value="{{ fmLine }}" onInput="{{ onFm }}">
+          <span class="lab" style="margin-top:10px;">الشعار النصي</span><input type="text" class="ic" value="{{ station }}" onInput="{{ onStation }}">
+        </div>
+        <div class="grp">
+          <h4>تاريخ «عاجل»</h4>
+          <label class="ck"><input type="checkbox" checked="{{ autoDate }}" onChange="{{ onAutoDate }}"> تاريخ اليوم تلقائياً</label>
+          <span class="lab" style="margin-top:11px;">أو تاريخ يدوي (DD.MM.YYYY)</span><input type="text" class="ic" value="{{ manualDate }}" onInput="{{ onManualDate }}" placeholder="مثال: 12.06.2026">
+          <span class="lab" style="margin-top:13px;">ضبط مكان التاريخ — أفقي</span><input type="range" class="rng" min="0" max="46" step="0.5" value="{{ dateLeft }}" onInput="{{ onDateLeft }}">
+          <span class="lab" style="margin-top:8px;">عمودي</span><input type="range" class="rng" min="0" max="45" step="0.5" value="{{ dateTop }}" onInput="{{ onDateTop }}">
+          <span class="lab" style="margin-top:8px;">حجم الخط</span><input type="range" class="rng" min="6" max="18" step="0.5" value="{{ dateFs }}" onInput="{{ onDateFs }}">
+        </div>
+        <div class="grp">
+          <h4>نسخ احتياطي ومشاركة</h4>
+          <span class="lab">صدّر كل إعداداتك وقوالبك كملف لمشاركتها أو نقلها لجهاز آخر</span>
+          <button onClick="{{ exportSettings }}" class="btn" style="width:100%;background:#26312f;color:#f2d47e;border:1px solid #34403d;margin-top:8px;">⤓ تصدير الإعدادات (JSON)</button>
+          <span class="lab" style="margin-top:13px;">استيراد ملف إعدادات</span>
+          <input type="file" accept="application/json,.json" onChange="{{ onImportSettings }}" style="color:#cfd6d8;font-size:12px;">
+        </div>
+        <button onClick="{{ closeSettings }}" class="btn" style="width:100%;background:var(--brick);color:#fdf6e3;">تم</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= BUILDER ================= -->
+  <sc-if value="{{ isBuilder }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;background:rgba(10,14,16,.6);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="background:#1b2326;border:1px solid #313b3f;border-radius:16px;padding:26px;width:460px;max-width:100%;max-height:90vh;overflow:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:20px;">تصميم جديد</div>
+          <button onClick="{{ closeBuilder }}" class="btn" style="background:#2a3338;color:#fdf6e3;padding:7px 14px;">✕</button>
+        </div>
+        <div class="grp">
+          <h4>المقاس</h4>
+          <select class="ic" value="{{ cfg.size }}" onChange="{{ onCfgSize }}">
+            <option value="1080x1080">مربّع · 1080×1080</option>
+            <option value="1080x1350">عمودي · 1080×1350</option>
+            <option value="1080x1920">ستوري · 1080×1920</option>
+            <option value="1920x1080">أفقي · 1920×1080</option>
+            <option value="1200x630">منشور فيسبوك عرضي · 1200×630</option>
+            <option value="1200x675">عرضي · 1200×675</option>
+            <option value="1640x624">غلاف فيسبوك · 1640×624</option>
+            <option value="custom">مخصّص (تحديد يدوي) ✎</option>
+          </select>
+          <sc-if value="{{ isCustomSize }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:11px;">
+              <div><span class="lab">العرض (px)</span><input type="number" class="ic" min="200" max="4000" value="{{ cfg.customW }}" onInput="{{ onCfgW }}" style="direction:ltr;text-align:center;"></div>
+              <div><span class="lab">الارتفاع (px)</span><input type="number" class="ic" min="200" max="4000" value="{{ cfg.customH }}" onInput="{{ onCfgH }}" style="direction:ltr;text-align:center;"></div>
+            </div>
+          </sc-if>
+        </div>
+        <div class="grp">
+          <h4>الخلفية</h4>
+          <select class="ic" value="{{ cfg.bg }}" onChange="{{ onCfgBg }}">
+            <option value="dark">داكن</option>
+            <option value="brick">طوبي</option>
+            <option value="deep">أحمر</option>
+            <option value="cream">كريمي</option>
+          </select>
+        </div>
+        <div class="grp">
+          <h4>العناصر</h4>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <label class="ck"><input type="checkbox" checked="{{ cfg.showImg }}" onChange="{{ onCfgImg }}"> صورة خلفية (سحب وإفلات)</label>
+            <label class="ck"><input type="checkbox" checked="{{ cfg.showBadge }}" onChange="{{ onCfgBadge }}"> شارة «عاجل» + تاريخ اليوم</label>
+            <label class="ck"><input type="checkbox" checked="{{ cfg.showText }}" onChange="{{ onCfgText }}"> نص (عنوان الخبر)</label>
+            <label class="ck"><input type="checkbox" checked="{{ cfg.showLogo }}" onChange="{{ onCfgLogo }}"> اللوغو</label>
+          </div>
+        </div>
+        <div class="grp">
+          <h4>عناصر PNG مرفقة</h4>
+          <span class="lab">أضف صور PNG شفافة لتظهر في التصميم</span>
+          <input type="file" accept="image/png,image/*" multiple onChange="{{ onCfgPngs }}" style="color:#cfd6d8;font-size:12px;">
+          <div style="font-family:var(--fontHead),sans-serif;font-size:12px;color:#9aa2a4;margin-top:8px;">المرفقة: {{ cfg.pngCount }} — بعد الإنشاء: اسحبها بالماوس، عجلة الماوس للتحجيم، «للأمام» للطبقات.</div>
+          <sc-for list="{{ pngList }}" as="pl" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;align-items:center;padding:5px 2px;border-bottom:1px solid #2a3338;"><span style="color:#cfd6d8;font-size:12px;font-family:var(--fontHead),sans-serif;">صورة {{ pl.n }}</span><span><span onClick="{{ pl.front }}" style="cursor:pointer;color:#f2d47e;font-size:12px;margin-left:12px;">للأمام</span><span onClick="{{ pl.del }}" style="cursor:pointer;color:#b94126;font-size:12px;">حذف</span></span></div></sc-for>
+        </div>
+        <button onClick="{{ createCustom }}" class="btn" style="width:100%;background:var(--brick);color:#fdf6e3;">إنشاء وبدء التعديل ←</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= GENERATOR ================= -->
+  <sc-if value="{{ isGenerator }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;background:rgba(10,14,16,.62);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="background:#1b2326;border:1px solid #313b3f;border-radius:16px;padding:26px;width:760px;max-width:100%;max-height:92vh;overflow:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:21px;">🤖 مولّد المنشورات</div>
+          <button onClick="{{ closeGenerator }}" class="btn" style="background:#2a3338;color:#fdf6e3;padding:7px 14px;">✕</button>
+        </div>
+        <div style="font-family:var(--fontHead),sans-serif;font-size:13px;color:#9aa2a4;margin-bottom:16px;">اكتب الخبر وارفع صورة — يجهّز لك ٣ قوالب فوراً بالنص والصورة، تختار أيها تكمّل عليه.</div>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:280px;">
+            <div class="grp">
+              <h4>نص الخبر</h4>
+              <span class="lab">العنوان / المتن</span>
+              <textarea class="ic" rows="4" style="resize:vertical;line-height:1.7;" value="{{ genHeadline }}" onInput="{{ onGenHeadline }}" placeholder="اكتب نص الخبر هنا..."></textarea>
+              <span class="lab" style="margin-top:11px;">الشريط المتحرك (اختياري)</span>
+              <input type="text" class="ic" value="{{ genTicker }}" onInput="{{ onGenTicker }}" placeholder="نص التيكر السفلي">
+            </div>
+            <div class="grp">
+              <h4>صورة الخبر</h4>
+              <span class="lab">ارفع صورة لتظهر في القوالب</span>
+              <input type="file" accept="image/*" onChange="{{ onGenImage }}" style="color:#cfd6d8;font-size:12px;">
+              <sc-if value="{{ genHasImage }}"><div style="margin-top:12px;height:120px;border-radius:9px;background-image:{{ genImageBg }};background-size:cover;background-position:center;border:1px solid #3a4448;"></div></sc-if>
+            </div>
+          </div>
+          <div style="flex:1;min-width:280px;">
+            <div class="grp" style="height:100%;">
+              <h4>اختر القالب الجاهز</h4>
+              <sc-for list="{{ genTpls }}" as="g" hint-placeholder-count="3">
+                <div onClick="{{ g.go }}" style="display:flex;align-items:center;gap:13px;padding:13px;margin-bottom:10px;border-radius:11px;background:#26312f;border:1px solid #34403d;cursor:pointer;">
+                  <div style="width:46px;height:60px;flex:none;border-radius:6px;overflow:hidden;background:var(--dark);position:relative;display:flex;align-items:center;justify-content:center;">
+                    <div style="position:absolute;inset:0;background-image:var(--patURL);background-size:cover;opacity:.45;"></div>
+                    <span style="position:absolute;top:0;right:0;left:0;height:3px;background:var(--gold);"></span>
+                    <div style="position:relative;width:26px;height:17px;background:var(--logoCur) center/contain no-repeat;"></div>
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:14px;">{{ g.name }}</div>
+                    <div style="font-family:var(--fontHead),sans-serif;font-weight:500;color:#9aa2a4;font-size:11px;margin-top:2px;">{{ g.desc }}</div>
+                  </div>
+                  <span style="color:var(--gold);font-size:18px;">←</span>
+                </div>
+              </sc-for>
+              <div style="font-family:var(--fontHead),sans-serif;font-size:11px;color:#7e8688;margin-top:4px;">سيُفتح التصميم بالنص والصورة جاهزَين — وتقدر تعدّل كل شيء بعدها.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.rootRef = React.createRef();
+    this.defaults = { dark:"#1b2326", brick:"#c1624c", deep:"#b94126", cream:"#fdf6e3", gold:"#f2d47e" };
+    this.DEFAULTS_DS = { ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, radius:0, bar:true, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, showLogo:true, showFreq:true, showPhoto:true, headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.", ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.", guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب", program:"اسم البرنامج", host:"مع المذيع" };
+    this.state = {
+      screen:"home", selected:null, settingsOpen:false, builderOpen:false, generatorOpen:false, ds:{}, templates:[], selPng:null, thumbs:{},
+      genHeadline:"", genImage:"",
+      customCfg:{ size:"1080x1080", bg:"dark", showImg:true, showBadge:false, showText:true, showLogo:true, pngs:[], imgFit:"cover", customW:1200, customH:800 },
+      t:{...this.defaults}, radius:0, bar:true, font:"plex",
+      showLogo:true, showFreq:true, showPhoto:true,
+      patUrl:null, ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, dateTop:14, dateLeft:7, dateFs:11,
+      station:"صوت البلد · من قلب حلب", fmLine:"FM 102.6 · من قلب حلب",
+      gradBg:false, gradPat:false,
+      autoDate:true, manualDate:"",
+      logoLight:null, logoDark:null, logoWhite:null,
+      fmWhite:null, fmBrick:null, fmDark:null,
+      headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.",
+      ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.",
+      guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب",
+      program:"اسم البرنامج", host:"مع المذيع", agLabel:"بودكاست راديو البلد",
+      clock:"20:00",
+      tickerLabel:"عاجل", showRerun:false, exportTransparent:false, exportScale:3,
+      wCity:"حلب", wTemp:"24", wCond:"مشمس جزئياً", wHi:"27", wLo:"15", wIcon:"☀",
+      mLeague:"الدوري الممتاز", mTeamA:"الاتحاد", mTeamB:"الوحدة", mScoreA:"2", mScoreB:"1", mStatus:"انتهت المباراة",
+      schedule:[
+        {name:"صباح البلد",host:"تقديم المذيع",time:"08:00"},
+        {name:"نشرة الأخبار",host:"غرفة الأخبار",time:"12:00"},
+        {name:"بين السطور",host:"تقديم المذيع",time:"16:00"},
+        {name:"ضيف وحكاية",host:"تقديم المذيع",time:"21:00"},
+        {name:"موسيقى البلد",host:"منوّعات",time:"23:00"}
+      ],
+      carIdx:0, carSlides:[
+        {head:"العنوان الرئيسي للكاروسيل", body:"اكتب هنا مقدّمة الموضوع التي تجذب القارئ للمتابعة."},
+        {head:"النقطة الأولى", body:"تفصيل أول فكرة بشكل مختصر وواضح ضمن سطرين أو ثلاثة."},
+        {head:"النقطة الثانية", body:"تفصيل ثاني فكرة مع الحفاظ على نفس الإيقاع البصري."},
+        {head:"تابعونا", body:"راديو البلد · FM 102.6 — من قلب حلب."}
+      ]
+    };
+  }
+  componentDidMount(){
+    try{ const s=JSON.parse(localStorage.getItem("albalad-studio")||"null"); if(s){ this.setState(s,()=>{ this.migratePngs(); this.applyVars(); }); } }catch(e){}
+    this.applyVars();
+    const tick=()=>{ const d=new Date(); this.setState({clock:String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}); };
+    tick(); this._t=setInterval(tick,20000);
+    this._onDown=(e)=>{ if(this.state.screen!=="edit")return; const rs=e.target.closest&&e.target.closest("[data-presize]"); if(rs){ e.preventDefault(); const i=+rs.getAttribute("data-presize"); const cont=rs.parentElement; const r=cont.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; const p=this.state.customCfg.pngs[i]; const s0=p?(p.s||1):1; const d0=Math.hypot(e.clientX-cx,e.clientY-cy)||1; this._presize={i,cont,cx,cy,s0,d0,ns:null}; return; } const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ const i=+pe.getAttribute("data-pidx"); const p=this.state.customCfg.pngs[i]; if(p){ e.preventDefault(); if(this.state.selPng!==i) this.setState({selPng:i}); this._pdrag={i,sx:e.clientX,sy:e.clientY,ox:p.x,oy:p.y,el:pe,nx:null}; } return; } const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; const k=el.getAttribute("data-mv"); e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); this._drag={k,el,node,sx:e.clientX,sy:e.clientY,ox:this.state[k+"X"]||0,oy:this.state[k+"Y"]||0,nx:null}; };
+    this._onMove=(e)=>{ if(this._presize){ const pr=this._presize; const d=Math.hypot(e.clientX-pr.cx,e.clientY-pr.cy); let ns=pr.s0*(d/pr.d0); ns=Math.max(0.2,Math.min(4,ns)); pr.ns=ns; pr.cont.style.width=(ns*120)+"px"; return; } if(this._pdrag){ const nx=this._pdrag.ox+(e.clientX-this._pdrag.sx), ny=this._pdrag.oy+(e.clientY-this._pdrag.sy); this._pdrag.el.style.marginLeft=nx+"px"; this._pdrag.el.style.marginTop=ny+"px"; this._pdrag.nx=nx; this._pdrag.ny=ny; return; } if(!this._drag)return; let nx=this._drag.ox+(e.clientX-this._drag.sx), ny=this._drag.oy+(e.clientY-this._drag.sy); const rt=this.rootRef.current; const TH=7; let snapV=false,snapH=false; const dr=this._drag; if(dr.node&&dr.el){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); const nr=dr.node.getBoundingClientRect(), er=dr.el.getBoundingClientRect(); const dx=(nr.left+nr.width/2)-(er.left+er.width/2); const dy=(nr.top+nr.height/2)-(er.top+er.height/2); if(Math.abs(dx)<TH){ nx+=dx; snapV=true; } if(Math.abs(dy)<TH){ ny+=dy; snapH=true; } } if(rt){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); } this.showGuides(dr.node,snapV,snapH); this._drag.nx=nx; this._drag.ny=ny; };
+    this._onUp=()=>{ if(this._presize){ const pr=this._presize; this._presize=null; if(pr.ns!=null) this.setPngScale(pr.i,pr.ns); return; } if(this._pdrag){ const pd=this._pdrag; this._pdrag=null; if(pd.nx!=null){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); pngs[pd.i]={...pngs[pd.i],x:Math.round(pd.nx),y:Math.round(pd.ny)}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); } return; } if(!this._drag)return; const k=this._drag.k,nx=this._drag.nx,ny=this._drag.ny; this._drag=null; this.hideGuides(); if(nx!=null) this.up({[k+"X"]:Math.round(nx),[k+"Y"]:Math.round(ny)}); };
+    document.addEventListener("pointerdown",this._onDown); document.addEventListener("pointermove",this._onMove); document.addEventListener("pointerup",this._onUp);
+    this._onWheel=(e)=>{ const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ e.preventDefault(); const i=+pe.getAttribute("data-pidx"); this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); const cur=pngs[i]; if(!cur)return null; let ns=(cur.s||1)-e.deltaY*0.0015; ns=Math.max(0.2,Math.min(4,ns)); pngs[i]={...cur,s:ns}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); return; } if(this.state.screen!=="edit")return; const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; e.preventDefault(); const k=el.getAttribute("data-mv"); let s=(this.state[k+"S"]||1)-e.deltaY*0.0015; s=Math.max(0.3,Math.min(3,s)); const rt=this.rootRef.current; if(rt) rt.style.setProperty("--"+k+"S",s); clearTimeout(this._wt); this._wt=setTimeout(()=>this.up({[k+"S"]:Math.round(s*100)/100}),260); };
+    document.addEventListener("wheel",this._onWheel,{passive:false});
+  }
+  componentWillUnmount(){ clearInterval(this._t); document.removeEventListener("pointerdown",this._onDown); document.removeEventListener("pointermove",this._onMove); document.removeEventListener("pointerup",this._onUp); document.removeEventListener("wheel",this._onWheel); }
+  showGuides(node,v,h){
+    if(!node){ this.hideGuides(); return; }
+    if(!this._gv){ this._gv=document.createElement("div"); this._gv.style.cssText="position:fixed;width:0;border-left:1.5px dashed #f2d47e;z-index:9999;pointer-events:none;display:none;box-shadow:0 0 4px rgba(242,212,126,.6);"; document.body.appendChild(this._gv); }
+    if(!this._gh){ this._gh=document.createElement("div"); this._gh.style.cssText="position:fixed;height:0;border-top:1.5px dashed #f2d47e;z-index:9999;pointer-events:none;display:none;box-shadow:0 0 4px rgba(242,212,126,.6);"; document.body.appendChild(this._gh); }
+    const r=node.getBoundingClientRect();
+    if(v){ this._gv.style.display="block"; this._gv.style.left=(r.left+r.width/2)+"px"; this._gv.style.top=r.top+"px"; this._gv.style.height=r.height+"px"; } else this._gv.style.display="none";
+    if(h){ this._gh.style.display="block"; this._gh.style.top=(r.top+r.height/2)+"px"; this._gh.style.left=r.left+"px"; this._gh.style.width=r.width+"px"; } else this._gh.style.display="none";
+  }
+  hideGuides(){ if(this._gv)this._gv.style.display="none"; if(this._gh)this._gh.style.display="none"; }
+  curSlot(){ const rt=this.rootRef.current; if(!rt)return null; return rt.querySelector("[data-export-node] image-slot"); }
+  slotReplace(){ const s=this.curSlot(); if(s&&s.shadowRoot){ const b=s.shadowRoot.querySelector('[data-act="replace"]'); if(b)b.click(); else { const i=s.shadowRoot.querySelector('input[type=file]'); if(i)i.click(); } } }
+  slotClear(){ const s=this.curSlot(); if(s&&s.shadowRoot){ const b=s.shadowRoot.querySelector('[data-act="clear"]'); if(b)b.click(); } }
+  applyVars(){
+    const r=this.rootRef.current; if(!r) return; const t=this.state.t;
+    r.style.setProperty("--dark",t.dark); r.style.setProperty("--brick",t.brick); r.style.setProperty("--deep",t.deep);
+    r.style.setProperty("--cream",t.cream); r.style.setProperty("--gold",t.gold);
+    r.style.setProperty("--radius",this.state.radius+"px");
+    r.style.setProperty("--barH",this.state.bar?"7px":"0px");
+    const pu=this.state.patUrl?("url("+this.state.patUrl+")"):"url(assets/pattern-soft.png)";
+    r.style.setProperty("--patURL",pu);
+    r.style.setProperty("--patURLalt",this.state.patUrl?("url("+this.state.patUrl+")"):"url(assets/pattern-brick.png)");
+    r.style.setProperty("--dateTop",this.state.dateTop+"%"); r.style.setProperty("--dateLeft",this.state.dateLeft+"%"); r.style.setProperty("--dateFs",this.state.dateFs+"px");
+    r.style.setProperty("--ptopOp",this.state.ptopOp); r.style.setProperty("--ptopSize",this.state.ptopSize+"%"); r.style.setProperty("--ptopY",this.state.ptopY+"px");
+    r.style.setProperty("--pbotOp",this.state.pbotOp); r.style.setProperty("--pbotSize",this.state.pbotSize+"%"); r.style.setProperty("--pbotY",this.state.pbotY+"px");
+    r.style.setProperty("--pboxOp",this.state.pboxOp); r.style.setProperty("--pboxSize",this.state.pboxSize+"%"); r.style.setProperty("--bodyW",this.state.bold?"600":"400");
+    r.style.setProperty("--headScale",this.state.headScale); r.style.setProperty("--txtAlign",this.state.txtAlign); r.style.setProperty("--txtPad",this.state.txtPad+"px");
+    r.style.setProperty("--imgY",this.state.imgY+"px"); r.style.setProperty("--boxY",this.state.boxY+"px"); r.style.setProperty("--badgeY",this.state.badgeY+"px");
+    r.style.setProperty("--imgScale",this.state.imgScale);
+    const gOv="linear-gradient(155deg, rgba(255,255,255,.10) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 100%)";
+    r.style.setProperty("--darkBg", this.state.gradBg?(gOv+", var(--dark)"):"var(--dark)");
+    r.style.setProperty("--brickBg", this.state.gradBg?(gOv+", var(--brick)"):"var(--brick)");
+    const fa=Math.max(0,Math.min(1,this.state.patFadeAmt||0)); const fEnd=(1-fa).toFixed(3);
+    const pm=fa<=0?"none":(this.state.patFadeDir==="top"?("linear-gradient(to bottom, rgba(0,0,0,"+fEnd+") 0%, #000 100%)"):("linear-gradient(to bottom, #000 0%, rgba(0,0,0,"+fEnd+") 100%)"));
+    r.style.setProperty("--patMask", pm);
+    r.style.setProperty("--cimgS",this.state.cimgS||1);
+    r.style.setProperty("--imgX",this.state.imgX+"px"); r.style.setProperty("--boxX",this.state.boxX+"px"); r.style.setProperty("--badgeX",this.state.badgeX+"px");
+    r.style.setProperty("--logoX",this.state.logoX+"px"); r.style.setProperty("--logoY",this.state.logoY+"px"); r.style.setProperty("--fmX",this.state.fmX+"px"); r.style.setProperty("--fmY",this.state.fmY+"px");
+    r.style.setProperty("--boxS",this.state.boxS); r.style.setProperty("--badgeS",this.state.badgeS); r.style.setProperty("--logoS",this.state.logoS); r.style.setProperty("--fmS",this.state.fmS);
+    const lwhite=this.state.logoWhite||"assets/logo-white.png";
+    const lbrick=this.state.logoLight||"assets/logo-brick.png";
+    const ld=this.state.logoDark||"assets/logo-main.png";
+    r.style.setProperty("--logoWhite","url("+lwhite+")"); r.style.setProperty("--logoLight","url("+lbrick+")"); r.style.setProperty("--logoDark","url("+ld+")");
+    const onBrick="url("+lwhite+")";
+    const onDark="url("+lbrick+")";
+    let cur=onDark;
+    if(["now_air","story","breaking_text"].includes(this.state.selected)) cur=onBrick;
+    if(this.state.selected==="custom"){ const b=this.state.customCfg.bg; cur=(b==="brick"||b==="deep")?onBrick:(b==="cream"?("url("+ld+")"):onDark); }
+    r.style.setProperty("--logoOnBrick",onBrick); r.style.setProperty("--logoOnDark",onDark); r.style.setProperty("--logoCur",cur);
+    const fmw=this.state.fmWhite||"assets/icon-fm.png", fmb=this.state.fmBrick||"assets/icon-fm.png", fmd=this.state.fmDark||"assets/icon-fm.png";
+    r.style.setProperty("--fmWhite","url("+fmw+")"); r.style.setProperty("--fmBrick","url("+fmb+")"); r.style.setProperty("--fmDark","url("+fmd+")");
+    const fmOnBrick="url("+fmw+")", fmOnDark="url("+fmb+")";
+    let fmCur=fmOnDark;
+    if(["now_air","story","breaking_text"].includes(this.state.selected)) fmCur=fmOnBrick;
+    if(this.state.selected==="custom"){ const b=this.state.customCfg.bg; fmCur=(b==="brick"||b==="deep")?fmOnBrick:(b==="cream"?("url("+fmd+")"):fmOnDark); }
+    r.style.setProperty("--fmCur",fmCur);
+    const cb=this.state.customCfg.bg; const clogo=(cb==="cream")?ld:((cb==="brick"||cb==="deep")?lwhite:lbrick);
+    r.style.setProperty("--customLogo","url("+clogo+")");
+    const fonts={plex:["'IBM Plex Sans Arabic'","'IBM Plex Sans Arabic'"],cairo:["'Tajawal'","'Cairo'"],tajawal:["'Tajawal'","'Tajawal'"],reem:["'Reem Kufi'","'Cairo'"]};
+    const [fh,fb]=fonts[this.state.font]||fonts.plex; r.style.setProperty("--fontHead",fh); r.style.setProperty("--fontBody",fb);
+  }
+  persist(){
+    const {t,font,patUrl,dateTop,dateLeft,dateFs,station,fmLine,gradBg,gradPat,autoDate,manualDate,logoLight,logoDark,logoWhite,fmWhite,fmBrick,fmDark,ds,templates,carSlides,wCity,wTemp,wCond,wHi,wLo,wIcon,mLeague,mTeamA,mTeamB,mScoreA,mScoreB,mStatus,schedule,customCfg,thumbs}=this.state;
+    try{ localStorage.setItem("albalad-studio",JSON.stringify({t,font,patUrl,dateTop,dateLeft,dateFs,station,fmLine,gradBg,gradPat,autoDate,manualDate,logoLight,logoDark,logoWhite,fmWhite,fmBrick,fmDark,ds,templates,carSlides,wCity,wTemp,wCond,wHi,wLo,wIcon,mLeague,mTeamA,mTeamB,mScoreA,mScoreB,mStatus,schedule,customCfg,thumbs})); }catch(e){}
+  }
+  up(patch){ this.setState(patch,()=>{ this.applyVars(); if(this.state.screen==="edit" && this.state.selected) this.saveDs(); else this.persist(); }); }
+  saveDs(){ const sel=this.state.selected; if(!sel){ this.persist(); return; } const snap={}; Object.keys(this.DEFAULTS_DS).forEach(k=>snap[k]=this.state[k]); const ds={...this.state.ds,[sel]:snap}; this.setState({ds},()=>this.persist()); }
+  openDesign(id){ const d={...this.DEFAULTS_DS, ...(this.state.ds[id]||{})}; this.setState({screen:"edit", selected:id, ...d}, ()=>this.applyVars()); }
+  resetDesign(id){ this.setState(s=>{ const ds={...s.ds}; delete ds[id]; const thumbs={...(s.thumbs||{})}; delete thumbs[id]; return {ds,thumbs}; },()=>this.persist()); }
+  saveTemplate(){ if(!this.state.selected) return; const name=prompt("اسم القالب:"); if(!name) return; const snap={}; Object.keys(this.DEFAULTS_DS).forEach(k=>snap[k]=this.state[k]); const tp={id:"tpl"+Date.now(),name,base:this.state.selected,snap}; this.setState(s=>({templates:[...s.templates,tp]}),()=>this.persist()); }
+  openTemplate(tp){ this.setState({screen:"edit", selected:tp.base, ...tp.snap}, ()=>this.applyVars()); }
+  deleteTemplate(id){ this.setState(s=>({templates:s.templates.filter(x=>x.id!==id)}),()=>this.persist()); }
+  setColor(k,v){ this.setState(s=>({t:{...s.t,[k]:v}}),()=>{ this.applyVars(); this.persist(); }); }
+  pickFile(key,file){ if(!file) return; const r=new FileReader(); r.onload=()=>this.up({[key]:r.result}); r.readAsDataURL(file); }
+  genPickImage(file){ if(!file) return; const r=new FileReader(); r.onload=()=>this.setState({genImage:r.result}); r.readAsDataURL(file); }
+  fillSlot(slotId,dataUrl){
+    if(!dataUrl) return;
+    try{
+      const arr=dataUrl.split(","); const mime=(arr[0].match(/:(.*?);/)||[])[1]||"image/png";
+      const bin=atob(arr[1]); let n=bin.length; const u8=new Uint8Array(n); while(n--) u8[n]=bin.charCodeAt(n);
+      const file=new File([u8],"news."+(mime.split("/")[1]||"png"),{type:mime});
+      const tryDrop=(tries)=>{
+        const el=this.rootRef.current && this.rootRef.current.querySelector("#"+slotId);
+        if(!el){ if(tries>0) setTimeout(()=>tryDrop(tries-1),120); return; }
+        const dt=new DataTransfer(); dt.items.add(file);
+        el.dispatchEvent(new DragEvent("drop",{bubbles:true,cancelable:true,dataTransfer:dt}));
+      };
+      setTimeout(()=>tryDrop(12),140);
+    }catch(e){}
+  }
+  genGo(id){
+    const slotMap={breaking_photo:"bp_photo",text_photo:"tp_photo",story:"st_photo"};
+    const patch={};
+    if(this.state.genHeadline && this.state.genHeadline.trim()) patch.headline=this.state.genHeadline;
+    if(this.state.genTicker && this.state.genTicker.trim()) patch.ticker=this.state.genTicker;
+    const d={...this.DEFAULTS_DS, ...(this.state.ds[id]||{}), ...patch, showPhoto:true};
+    this.setState({screen:"edit", selected:id, generatorOpen:false, ...d}, ()=>{
+      this.applyVars();
+      if(this.state.genImage && slotMap[id]) this.fillSlot(slotMap[id], this.state.genImage);
+    });
+  }
+  setCfg(patch){ this.setState(s=>({customCfg:{...s.customCfg,...patch}}),()=>this.applyVars()); }
+  addPngs(files){ const arr=Array.from(files||[]); Promise.all(arr.map(f=>new Promise(res=>{const r=new FileReader();r.onload=()=>{ const im=new Image(); im.onload=()=>res({u:r.result,ar:(im.naturalWidth&&im.naturalHeight)?(im.naturalWidth/im.naturalHeight):1}); im.onerror=()=>res({u:r.result,ar:1}); im.src=r.result; };r.readAsDataURL(f);}))).then(items=>this.setState(s=>{ const np=items.map((it,k)=>({url:it.u,x:0,y:0,s:1,ar:it.ar,id:"p"+Date.now()+"_"+k})); const layers=(s.customCfg.layers||[]).concat(np.map(p=>"png:"+p.id)); return {customCfg:{...s.customCfg,pngs:[...s.customCfg.pngs,...np],layers}}; },()=>this.persist())); }
+  moveLayer(id,dir){ this.setState(s=>{ const lay=this.effOrder(s.customCfg); const i=lay.indexOf(id); const j=i+dir; if(i<0||j<0||j>=lay.length) return null; const a=lay.slice(); const tmp=a[i]; a[i]=a[j]; a[j]=tmp; return {customCfg:{...s.customCfg,layers:a}}; },()=>{this.persist();this.applyVars();}); }
+  effOrder(c){ const base=(c.layers&&c.layers.length)?c.layers.slice():["image","badge","text","logo"]; const active=[]; if(c.showImg)active.push("image"); if(c.showBadge)active.push("badge"); if(c.showText)active.push("text"); if(c.showLogo)active.push("logo"); (c.pngs||[]).forEach(p=>active.push("png:"+p.id)); let ord=base.filter(x=>active.includes(x)); active.forEach(x=>{ if(!ord.includes(x))ord.push(x); }); return ord; }
+  pngToFront(i){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); const x=pngs.splice(i,1)[0]; pngs.push(x); return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); }
+  pngDel(i){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); const rm=pngs.splice(i,1)[0]; const layers=(s.customCfg.layers||[]).filter(x=>x!=="png:"+(rm&&rm.id)); return {customCfg:{...s.customCfg,pngs,layers},selPng:null}; },()=>this.persist()); }
+  setPngScale(i,v){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); if(!pngs[i])return null; pngs[i]={...pngs[i],s:Math.max(0.2,Math.min(4,v))}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); }
+  migratePngs(){ this.setState(s=>{ const c=s.customCfg||{}; const pngs=(c.pngs||[]); let changed=false; const np=pngs.map((p,i)=>{ if(p && !p.id){ changed=true; return {...p, id:"p"+Date.now()+"_"+i, s:(p.s||1), x:(p.x||0), y:(p.y||0)}; } return p; }); if(!changed) return null; const layers=(c.layers||[]).slice(); np.forEach(p=>{ if(!layers.includes("png:"+p.id)) layers.push("png:"+p.id); }); return {customCfg:{...c, pngs:np, layers}}; },()=>{this.persist(); this.backfillAr();}); }
+  backfillAr(){ const pngs=(this.state.customCfg&&this.state.customCfg.pngs)||[]; pngs.forEach((p,i)=>{ if(p && p.url && !p.ar){ const im=new Image(); im.onload=()=>{ const ar=(im.naturalWidth&&im.naturalHeight)?(im.naturalWidth/im.naturalHeight):1; this.setState(s=>{ const arr=s.customCfg.pngs.slice(); if(arr[i]&&arr[i].id===p.id) arr[i]={...arr[i],ar}; return {customCfg:{...s.customCfg,pngs:arr}}; },()=>this.persist()); }; im.src=p.url; } }); }
+  exportPng(){
+    const node=this.rootRef.current && this.rootRef.current.querySelector("[data-export-node]");
+    if(!node || !window.html2canvas){ alert("جارٍ تحميل أداة التصدير، حاول بعد لحظات."); return; }
+    const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}"; document.head.appendChild(st);
+    const w=+node.getAttribute("data-w")||node.offsetWidth;
+    const q=Math.max(2,this.state.exportScale||3);
+    const scale=(w/node.offsetWidth)*q;
+    const trans=this.state.exportTransparent;
+    const prevBg=node.style.background;
+    if(trans) node.style.background="transparent";
+    window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:0}).then(c=>{
+      const a=document.createElement("a"); a.download="albalad-"+this.state.selected+(trans?"-transparent":"")+".png"; a.href=c.toDataURL("image/png"); a.click();
+      node.style.background=prevBg; st.remove();
+    }).catch(()=>{ node.style.background=prevBg; st.remove(); });
+  }
+  captureThumb(done){
+    const sel=this.state.selected;
+    const node=this.rootRef.current && this.rootRef.current.querySelector("[data-export-node]");
+    if(!sel || !node || !window.html2canvas){ if(done)done(); return; }
+    const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}"; document.head.appendChild(st);
+    const scale=Math.min(1, 360/(node.offsetWidth||360));
+    window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:0}).then(c=>{
+      let url=""; try{ url=c.toDataURL("image/jpeg",0.7); }catch(e){}
+      st.remove();
+      if(url){ this.setState(s=>({thumbs:{...(s.thumbs||{}),[sel]:url}}),()=>{ this.persist(); if(done)done(); }); }
+      else if(done) done();
+    }).catch(()=>{ st.remove(); if(done)done(); });
+  }
+  leaveEdit(to){ if(this.state.screen==="edit"){ this.captureThumb(()=>this.setState({screen:to})); } else { this.setState({screen:to}); } }
+  dates(){
+    const d=new Date(); const dd=String(d.getDate()).padStart(2,"0"); const mm=String(d.getMonth()+1).padStart(2,"0"); const yyyy=""+d.getFullYear();
+    if(this.state.autoDate) return {dm:dd+"."+mm, y:yyyy, full:dd+"."+mm+"."+yyyy};
+    const m=this.state.manualDate||""; const p=m.split(".");
+    if(p.length>=3) return {dm:p[0]+"."+p[1], y:p.slice(2).join("."), full:m};
+    return {dm:m, y:"", full:m};
+  }
+  renderVals(){
+    const ev=h=>e=>h(e.target.value); const dd=this.dates();
+    const logoLight=this.state.logoLight||"assets/logo-white.png";
+    const logoDark=this.state.logoDark||"assets/logo-main.png";
+    const sel=this.state.selected;
+    const list=[
+      {id:"breaking_photo",name:"عاجل — صورة + نص",cat:"منشور"},
+      {id:"breaking_text",name:"عاجل — نص",cat:"منشور"},
+      {id:"text_photo",name:"نص + صورة",cat:"منشور"},
+      {id:"quote",name:"اقتباس",cat:"منشور"},
+      {id:"square",name:"منشور مربّع",cat:"منشور"},
+      {id:"story",name:"ستوري عاجل",cat:"منشور"},
+      {id:"quote_deco",name:"اقتباس مزخرف",cat:"منشور"},
+      {id:"carousel",name:"كاروسيل",cat:"منشور"},
+      {id:"weather",name:"بطاقة الطقس",cat:"سوشيال"},
+      {id:"match",name:"نتائج مباريات",cat:"سوشيال"},
+      {id:"audiogram",name:"أوديوغرام بودكاست",cat:"بث"},
+      {id:"full_screen",name:"شاشة بث كاملة",cat:"بث"},
+      {id:"fb_cover",name:"غلاف فيسبوك",cat:"سوشيال"},
+      {id:"schedule",name:"جدول البرامج",cat:"سوشيال"},
+      {id:"now_air",name:"الآن على الهواء",cat:"سوشيال"}
+    ];
+    const designs=list.map(x=>{ const thumb=(this.state.thumbs||{})[x.id]; const edited=!!thumb||!!(this.state.ds||{})[x.id]; return {...x, open:()=>this.openDesign(x.id), hasThumb:!!thumb, noThumb:!thumb, canDelete:edited, hideDelete:!edited, reset:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); if(confirm("حذف هذا المنشور وإرجاعه للحالة الافتراضية؟")) this.resetDesign(x.id); }, thumbStyle: thumb?{position:"absolute",inset:0,width:"100%",height:"100%",backgroundImage:'url("'+thumb+'")',backgroundSize:"contain",backgroundRepeat:"no-repeat",backgroundPosition:"center",backgroundColor:"#11171a"}:null }; });
+    const selName=(list.find(x=>x.id===sel)||{}).name||"";
+    return {
+      rootRef:this.rootRef,
+      isHome:this.state.screen==="home", isPick:this.state.screen==="pick", isEdit:this.state.screen==="edit",
+      isSettings:this.state.settingsOpen,
+      isGenerator:this.state.generatorOpen,
+      openGenerator:()=>this.setState({generatorOpen:true}),
+      closeGenerator:()=>this.setState({generatorOpen:false}),
+      genHeadline:this.state.genHeadline, genTicker:this.state.genTicker,
+      genHasImage:!!this.state.genImage, genImageBg:this.state.genImage?("url("+this.state.genImage+")"):"none",
+      onGenHeadline:ev(v=>this.setState({genHeadline:v})), onGenTicker:ev(v=>this.setState({genTicker:v})),
+      onGenImage:e=>this.genPickImage(e.target.files[0]),
+      genTpls:[
+        {id:"breaking_photo",name:"عاجل — صورة + نص",desc:"شارة عاجل + صورة أعلى النص"},
+        {id:"text_photo",name:"نص + صورة",desc:"صورة مؤطّرة فوق المتن"},
+        {id:"story",name:"ستوري عاجل",desc:"عمودي للستوريز بخلفية"}
+      ].map(g=>({...g, go:()=>this.genGo(g.id)})),
+      designs, selName,
+      templates:this.state.templates.map(tp=>({...tp, open:()=>this.openTemplate(tp), del:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.deleteTemplate(tp.id); }})),
+      saveTpl:()=>this.saveTemplate(),
+      d:{...Object.fromEntries(list.map(x=>[x.id, sel===x.id])), custom: sel==="custom"},
+      isBuilder:this.state.builderOpen,
+      cfg:(()=>{ const c=this.state.customCfg; let w,h; if(c.size==="custom"){ w=Math.max(200,Math.min(4000,parseInt(c.customW)||1200)); h=Math.max(200,Math.min(4000,parseInt(c.customH)||800)); } else { const a=c.size.split("x").map(Number); w=a[0]; h=a[1]; } const sc=470/Math.max(w,h); const t=this.state.t;
+        const bgMap={dark:t.dark,brick:t.brick,deep:t.deep,cream:t.cream}; const bgSolid=bgMap[c.bg]||t.dark; const bgColor=(this.state.gradBg&&c.bg!=="cream")?("linear-gradient(155deg, rgba(255,255,255,.10) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 100%), "+bgSolid):bgSolid;
+        const ord=this.effOrder(c); const zMap={}; ord.forEach((id,i)=>zMap[id]=i+1);
+        return {...c, w, h, dispW:Math.round(w*sc), dispH:Math.round(h*sc), bgColor, fgColor:c.bg==="cream"?t.dark:t.cream, logo:c.bg==="cream"?logoDark:logoLight, pngCount:c.pngs.length, zImage:zMap["image"]||0, zBadge:zMap["badge"]||0, zText:zMap["text"]||0, zLogo:zMap["logo"]||0, pngsR:c.pngs.map((p,i)=>({x:p.x,y:p.y,w:Math.round((p.s||1)*120),z:zMap["png:"+p.id]||(i+1),i,outline:this.state.selPng===i?"2px dashed #f2d47e":"none",selected:this.state.selPng===i,imgStyle:{width:"100%",aspectRatio:String(p.ar||1),backgroundImage:'url("'+p.url+'")',backgroundSize:"contain",backgroundRepeat:"no-repeat",backgroundPosition:"center",pointerEvents:"none"}})) }; })(),
+      t:this.state.t, radius:this.state.radius, bar:this.state.bar,
+      ptopOp:this.state.ptopOp, ptopSize:this.state.ptopSize, ptopY:this.state.ptopY, pbotOp:this.state.pbotOp, pbotSize:this.state.pbotSize, pbotY:this.state.pbotY, pboxOp:this.state.pboxOp, pboxSize:this.state.pboxSize,
+      font:this.state.font,
+      showLogo:this.state.showLogo, showFreq:this.state.showFreq, showPhoto:this.state.showPhoto,
+      dateTop:this.state.dateTop, dateLeft:this.state.dateLeft, dateFs:this.state.dateFs,
+      station:this.state.station, fmLine:this.state.fmLine,
+      gradBg:this.state.gradBg, gradPat:this.state.gradPat,
+      patFadeAmt:this.state.patFadeAmt, patFadeDir:this.state.patFadeDir,
+      onGradBg:e=>this.up({gradBg:e.target.checked}), onGradPat:e=>this.up({gradPat:e.target.checked}),
+      onPatFadeAmt:ev(v=>this.up({patFadeAmt:parseFloat(v)})), onPatFadeDir:ev(v=>this.up({patFadeDir:v})),
+      autoDate:this.state.autoDate, manualDate:this.state.manualDate,
+      headline:this.state.headline, ticker:this.state.ticker,
+      guest:this.state.guest, guestTitle:this.state.guestTitle, program:this.state.program, host:this.state.host, agLabel:this.state.agLabel,
+      wCity:this.state.wCity, wTemp:this.state.wTemp, wCond:this.state.wCond, wHi:this.state.wHi, wLo:this.state.wLo, wIcon:this.state.wIcon,
+      mLeague:this.state.mLeague, mTeamA:this.state.mTeamA, mTeamB:this.state.mTeamB, mScoreA:this.state.mScoreA, mScoreB:this.state.mScoreB, mStatus:this.state.mStatus,
+      mInitA:(this.state.mTeamA||" ").trim().charAt(0), mInitB:(this.state.mTeamB||" ").trim().charAt(0),
+      waveBars:Array.from({length:42}).map(()=>({h:Math.round(18+Math.random()*82)})),
+      carBg:(this.state.carIdx%2===0)?this.state.t.dark:this.state.t.brick,
+      carNum:"0"+(this.state.carIdx+1)+" / 0"+this.state.carSlides.length,
+      carPos:(this.state.carIdx+1)+" من "+this.state.carSlides.length,
+      carHead:(this.state.carSlides[this.state.carIdx]||{}).head||"",
+      carBody:(this.state.carSlides[this.state.carIdx]||{}).body||"",
+      carDots:this.state.carSlides.map((s,i)=>({c:i===this.state.carIdx?this.state.t.gold:"rgba(253,246,227,.3)"})),
+      carPrev:()=>this.setState(s=>({carIdx:Math.max(0,s.carIdx-1)})),
+      carNext:()=>this.setState(s=>({carIdx:Math.min(s.carSlides.length-1,s.carIdx+1)})),
+      carAdd:()=>this.setState(s=>({carSlides:[...s.carSlides,{head:"شريحة جديدة",body:"اكتب المحتوى هنا."}],carIdx:s.carSlides.length}),()=>this.persist()),
+      carDel:()=>this.setState(s=>{ if(s.carSlides.length<=1)return null; const cs=s.carSlides.slice(); cs.splice(s.carIdx,1); return {carSlides:cs,carIdx:Math.max(0,s.carIdx-1)}; },()=>this.persist()),
+      onCarHead:ev(v=>this.setState(s=>{const cs=s.carSlides.slice();cs[s.carIdx]={...cs[s.carIdx],head:v};return{carSlides:cs};},()=>this.persist())),
+      onCarBody:ev(v=>this.setState(s=>{const cs=s.carSlides.slice();cs[s.carIdx]={...cs[s.carIdx],body:v};return{carSlides:cs};},()=>this.persist())),
+      onWCity:ev(v=>this.up({wCity:v})), onWTemp:ev(v=>this.up({wTemp:v})), onWCond:ev(v=>this.up({wCond:v})), onWHi:ev(v=>this.up({wHi:v})), onWLo:ev(v=>this.up({wLo:v})), onWIcon:ev(v=>this.up({wIcon:v})),
+      onMLeague:ev(v=>this.up({mLeague:v})), onMTeamA:ev(v=>this.up({mTeamA:v})), onMTeamB:ev(v=>this.up({mTeamB:v})), onMScoreA:ev(v=>this.up({mScoreA:v})), onMScoreB:ev(v=>this.up({mScoreB:v})), onMStatus:ev(v=>this.up({mStatus:v})),
+      isCarousel:sel==="carousel", isWeather:sel==="weather", isMatch:sel==="match",
+      isBroadcast:sel==="full_screen",
+      tickerLabel:this.state.tickerLabel, showRerun:this.state.showRerun,
+      onTickerLabel:ev(v=>this.up({tickerLabel:v})), onShowRerun:e=>this.up({showRerun:e.target.checked}),
+      exportTransparent:this.state.exportTransparent, exportScale:this.state.exportScale,
+      onExportTransparent:e=>this.up({exportTransparent:e.target.checked}),
+      onExportScale:ev(v=>this.up({exportScale:parseFloat(v)})),
+      imgY:this.state.imgY, boxY:this.state.boxY, badgeY:this.state.badgeY, imgX:this.state.imgX,
+      clock:this.state.clock, logoLight, logoDark,
+      dateDM:dd.dm, dateY:dd.y, dateFull:dd.full,
+      goPick:()=>this.setState({screen:"pick"}),
+      goHome:()=>this.leaveEdit("home"),
+      goBack:()=>this.leaveEdit("pick"),
+      openSettings:()=>this.setState({settingsOpen:true}),
+      closeSettings:()=>this.setState({settingsOpen:false}),
+      exportPng:()=>this.exportPng(),
+      resetAll:()=>this.up({...this.DEFAULTS_DS}),
+      onDark:ev(v=>this.setColor("dark",v)), onBrick:ev(v=>this.setColor("brick",v)), onDeep:ev(v=>this.setColor("deep",v)),
+      onCream:ev(v=>this.setColor("cream",v)), onGold:ev(v=>this.setColor("gold",v)),
+      onRadius:ev(v=>this.up({radius:parseInt(v)})),
+      onPtopOp:ev(v=>this.up({ptopOp:parseFloat(v)})), onPtopSize:ev(v=>this.up({ptopSize:parseInt(v)})), onPtopY:ev(v=>this.up({ptopY:parseInt(v)})),
+      onPbotOp:ev(v=>this.up({pbotOp:parseFloat(v)})), onPbotSize:ev(v=>this.up({pbotSize:parseInt(v)})), onPbotY:ev(v=>this.up({pbotY:parseInt(v)})),
+      onPboxOp:ev(v=>this.up({pboxOp:parseFloat(v)})), onPboxSize:ev(v=>this.up({pboxSize:parseInt(v)})),
+      onBar:e=>this.up({bar:e.target.checked}), onFont:ev(v=>this.up({font:v})),
+      onShowLogo:e=>this.up({showLogo:e.target.checked}), onShowFreq:e=>this.up({showFreq:e.target.checked}), onShowPhoto:e=>this.up({showPhoto:e.target.checked}),
+      onPatternFile:e=>this.pickFile("patUrl",e.target.files[0]),
+      openBuilder:()=>this.setState({builderOpen:true}),
+      closeBuilder:()=>this.setState({builderOpen:false}),
+      createCustom:()=>{ const d={...this.DEFAULTS_DS, ...(this.state.ds["custom"]||{})}; this.setState({selected:"custom",screen:"edit",builderOpen:false, ...d},()=>this.applyVars()); },
+      onCfgSize:e=>this.setCfg({size:e.target.value}), onCfgBg:e=>this.setCfg({bg:e.target.value}),
+      isCustomSize:this.state.customCfg.size==="custom",
+      onCfgW:e=>this.setCfg({customW:e.target.value}), onCfgH:e=>this.setCfg({customH:e.target.value}),
+      onCfgImg:e=>this.setCfg({showImg:e.target.checked}), onCfgBadge:e=>this.setCfg({showBadge:e.target.checked}),
+      onCfgText:e=>this.setCfg({showText:e.target.checked}), onCfgLogo:e=>this.setCfg({showLogo:e.target.checked}),
+      onCfgPngs:e=>this.addPngs(e.target.files),
+      pngList:this.state.customCfg.pngs.map((p,i)=>({n:i+1, front:()=>this.pngToFront(i), del:()=>this.pngDel(i)})),
+      layerList:(()=>{ const c=this.state.customCfg; const names={image:"الصورة",badge:"شارة عاجل",text:"النص",logo:"اللوغو"}; const ord=this.effOrder(c); const pIdx={}; c.pngs.forEach((p,i)=>pIdx["png:"+p.id]=i); return ord.slice().reverse().map((id,k)=>{ const pi=(id in pIdx)?pIdx[id]:-1; const png=pi>=0?c.pngs[pi]:null; const isLogo=id==="logo"; const isImg=id==="image"; const ls=this.state.logoS||1; const cz=this.state.cimgS||1; const fitC=(c.imgFit||"cover")==="contain"; return { id, name: png?("صورة "+(pi+1)):(names[id]||id), top:k===0, bottom:k===ord.length-1, up:()=>this.moveLayer(id,1), down:()=>this.moveLayer(id,-1), isPng:!!png, isImg, fitLabel: fitC?"كامل الصورة":"يملأ الإطار", toggleFit:()=>this.setCfg({imgFit:fitC?"cover":"contain"}), resizable:!!png||isLogo||isImg, scale: png?(png.s||1):(isLogo?ls:(isImg?cz:1)), onScale: png?ev(v=>this.setPngScale(pi,parseFloat(v))):(isLogo?ev(v=>this.up({logoS:parseFloat(v)})):(isImg?ev(v=>this.up({cimgS:parseFloat(v)})):null)), bigger: png?(()=>this.setPngScale(pi,(png.s||1)+0.1)):(isLogo?(()=>this.up({logoS:Math.min(3,ls+0.1)})):(isImg?(()=>this.up({cimgS:Math.min(4,cz+0.1)})):null)), smaller: png?(()=>this.setPngScale(pi,(png.s||1)-0.1)):(isLogo?(()=>this.up({logoS:Math.max(0.3,ls-0.1)})):(isImg?(()=>this.up({cimgS:Math.max(0.5,cz-0.1)})):null)), del: png?(()=>this.pngDel(pi)):null }; }); })(),
+      bold:this.state.bold,
+      headScale:this.state.headScale, txtAlign:this.state.txtAlign, txtPad:this.state.txtPad,
+      onBold:e=>this.up({bold:e.target.checked}),
+      onHeadScale:ev(v=>this.up({headScale:parseFloat(v)})), onTxtAlign:ev(v=>this.up({txtAlign:v})), onTxtPad:ev(v=>this.up({txtPad:parseInt(v)})),
+      onImgY:ev(v=>this.up({imgY:parseInt(v)})), onImgX:ev(v=>this.up({imgX:parseInt(v)})), onBoxY:ev(v=>this.up({boxY:parseInt(v)})), onBadgeY:ev(v=>this.up({badgeY:parseInt(v)})),
+      slotReplace:()=>this.slotReplace(), slotClear:()=>this.slotClear(),
+      imgScale:this.state.imgScale, onImgScale:ev(v=>this.up({imgScale:parseFloat(v)})),
+      hasPhoto:["breaking_photo","text_photo","square","story","full_screen","audiogram"].includes(sel),
+      isCustomSel:sel==="custom",
+      selPng:this.state.selPng,
+      hasSelPng:this.state.selPng!=null && !!this.state.customCfg.pngs[this.state.selPng],
+      noSelPng:!(this.state.selPng!=null && !!this.state.customCfg.pngs[this.state.selPng]),
+      selPngNum:(this.state.selPng!=null)?(this.state.selPng+1):0,
+      selPngScale:(this.state.selPng!=null && this.state.customCfg.pngs[this.state.selPng])?(this.state.customCfg.pngs[this.state.selPng].s||1):1,
+      onSelPngScale:ev(v=>this.setPngScale(this.state.selPng,parseFloat(v))),
+      selPngBigger:()=>{ const i=this.state.selPng; if(i!=null){ const p=this.state.customCfg.pngs[i]; if(p) this.setPngScale(i,(p.s||1)+0.1); } },
+      selPngSmaller:()=>{ const i=this.state.selPng; if(i!=null){ const p=this.state.customCfg.pngs[i]; if(p) this.setPngScale(i,(p.s||1)-0.1); } },
+      onDateTop:ev(v=>this.up({dateTop:parseFloat(v)})), onDateLeft:ev(v=>this.up({dateLeft:parseFloat(v)})), onDateFs:ev(v=>this.up({dateFs:parseFloat(v)})),
+      onStation:ev(v=>this.up({station:v})), onFm:ev(v=>this.up({fmLine:v})),
+      onAutoDate:e=>this.up({autoDate:e.target.checked}), onManualDate:ev(v=>this.up({manualDate:v,autoDate:false})),
+      onHeadline:ev(v=>this.up({headline:v})), onTicker:ev(v=>this.up({ticker:v})),
+      onGuest:ev(v=>this.up({guest:v})), onGuestTitle:ev(v=>this.up({guestTitle:v})),
+      onProgram:ev(v=>this.up({program:v})), onHost:ev(v=>this.up({host:v})), onAgLabel:ev(v=>this.up({agLabel:v})),
+      onLogoLight:e=>this.pickFile("logoLight",e.target.files[0]), onLogoDark:e=>this.pickFile("logoDark",e.target.files[0]), onLogoWhite:e=>this.pickFile("logoWhite",e.target.files[0]),
+      onFmWhite:e=>this.pickFile("fmWhite",e.target.files[0]), onFmBrick:e=>this.pickFile("fmBrick",e.target.files[0]), onFmDark:e=>this.pickFile("fmDark",e.target.files[0]),
+      schedule:this.state.schedule,
+      isSchedule:sel==="schedule",
+      scheduleRows:this.state.schedule.map((row,i)=>({
+        ...row, n:i+1,
+        onName:ev(v=>this.editSched(i,"name",v)),
+        onHost:ev(v=>this.editSched(i,"host",v)),
+        onTime:ev(v=>this.editSched(i,"time",v)),
+        del:()=>this.setState(s=>{const sc=s.schedule.slice();sc.splice(i,1);return{schedule:sc};},()=>this.persist())
+      })),
+      schedAdd:()=>this.setState(s=>({schedule:[...s.schedule,{name:"برنامج جديد",host:"المذيع",time:"00:00"}]}),()=>this.persist()),
+      exportSettings:()=>this.exportSettings(),
+      onImportSettings:e=>this.importSettings(e.target.files[0])
+    };
+  }
+  editSched(i,k,v){ this.setState(s=>{ const sc=s.schedule.slice(); sc[i]={...sc[i],[k]:v}; return {schedule:sc}; },()=>this.persist()); }
+  exportSettings(){
+    const keys=["t","font","patUrl","dateTop","dateLeft","dateFs","station","fmLine","gradBg","gradPat","autoDate","manualDate","logoLight","logoDark","logoWhite","fmWhite","fmBrick","fmDark","ds","templates","carSlides","wCity","wTemp","wCond","wHi","wLo","wIcon","mLeague","mTeamA","mTeamB","mScoreA","mScoreB","mStatus","schedule","customCfg"];
+    const out={}; keys.forEach(k=>out[k]=this.state[k]);
+    const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="albalad-identity-settings.json"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }
+  importSettings(file){
+    if(!file) return; const r=new FileReader();
+    r.onload=()=>{ try{ const o=JSON.parse(r.result); this.setState(o,()=>{ this.applyVars(); this.persist(); alert("تم استيراد الإعدادات بنجاح ✓"); }); }catch(e){ alert("ملف غير صالح."); } };
+    r.readAsText(file);
+  }
+}
+</script>
+</body>
+</html>
