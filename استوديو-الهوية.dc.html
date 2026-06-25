@@ -23,8 +23,14 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
+    var __reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (__reloaded) return; __reloaded = true; window.location.reload();
+    });
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        if (reg && reg.update) { try { reg.update(); } catch (e) {} }
+      }).catch(function () {});
     });
   }
 </script>
@@ -43,6 +49,11 @@
   .ck{display:flex;align-items:center;gap:8px;color:#fdf6e3;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:500;font-size:13px;cursor:pointer;}
   .ck input{accent-color:#c1624c;width:16px;height:16px;}
   image-slot{display:block;}
+  @media (max-width:760px){
+    .edit-body{flex-direction:column !important;}
+    .edit-preview{order:-1;height:46vh;flex:none !important;position:sticky;top:0;z-index:6;background:#d6d0c3;padding:14px !important;box-shadow:0 3px 10px rgba(0,0,0,.18);}
+    .edit-panel{width:100% !important;max-height:none !important;}
+  }
 </style>
 </helmet>
 <div dir="rtl" ref="{{ rootRef }}" style="--dark:#1b2326;--brick:#c1624c;--deep:#b94126;--cream:#fdf6e3;--gold:#f2d47e;--radius:0px;--barH:7px;--patURL:url(assets/pattern-soft.png);--patURLalt:url(assets/pattern-brick.png);--logoLight:url(assets/logo-white.png);--logoDark:url(assets/logo-main.png);--customLogo:url(assets/logo-white.png);--logoCur:url(assets/logo-brick.png);--ptopOp:0.9;--ptopSize:130%;--ptopY:0px;--pbotOp:0.9;--pbotSize:130%;--pbotY:0px;--pboxOp:0.5;--pboxSize:85%;--txtAlign:justify;--headScale:1;--txtPad:28px;--imgY:0px;--boxY:0px;--badgeY:0px;--dateTop:14%;--dateLeft:7%;--dateW:36%;--dateFs:11px;--bodyW:400;--fontHead:'IBM Plex Sans Arabic';--fontBody:'IBM Plex Sans Arabic';font-family:var(--fontBody),sans-serif;font-weight:var(--bodyW);min-height:100vh;">
@@ -130,8 +141,8 @@
         <button onClick="{{ saveTpl }}" class="btn" style="background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">★ حفظ كقالب</button>
         <button onClick="{{ exportPng }}" class="btn" style="background:var(--brick);color:#fdf6e3;font-size:14px;padding:9px 20px;">⤓ حفظ بدقة عالية</button>
       </div>
-      <div style="display:flex;flex:1;align-items:stretch;">
-        <div style="width:300px;flex:none;background:#1b2326;padding:18px 16px;overflow:auto;max-height:calc(100vh - 56px);">
+      <div class="edit-body" style="display:flex;flex:1;align-items:stretch;">
+        <div class="edit-panel" style="width:300px;flex:none;background:#1b2326;padding:18px 16px;overflow:auto;max-height:calc(100vh - 56px);">
           <div class="grp">
             <h4>الألوان</h4>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -271,6 +282,16 @@
                 <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;color:#8a9295;line-height:1.7;">انقر على أي صورة مرفقة في التصميم لتحديدها، ثم كبّرها أو صغّرها من هنا.</div>
               </sc-if>
             </div>
+            <sc-if value="{{ cImgOn }}">
+            <div class="grp">
+              <h4>صورة الخلفية — الحجم والموضع</h4>
+              <span class="lab">الحجم ({{ cimgW }}%)</span><input type="range" class="rng" min="20" max="160" step="1" value="{{ cimgW }}" onInput="{{ onCimgSize }}">
+              <span class="lab" style="margin-top:8px;">الموضع (أفقي)</span><input type="range" class="rng" min="-300" max="300" step="2" value="{{ cimgPX }}" onInput="{{ onCimgPX }}">
+              <span class="lab" style="margin-top:8px;">الموضع (عمودي)</span><input type="range" class="rng" min="-300" max="300" step="2" value="{{ cimgPY }}" onInput="{{ onCimgPY }}">
+              <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.6;margin-top:8px;">💡 أو اسحب الزوايا الذهبية مباشرةً على التصميم لتغيير المساحة. الصورة تحافظ على نسبها دائماً.</div>
+              <button onClick="{{ cimgReset }}" class="btn" style="width:100%;margin-top:10px;background:#2a3338;color:#f2d47e;border:1px solid #34403d;">إعادة ضبط الخلفية</button>
+            </div>
+            </sc-if>
             <div class="grp">
               <h4>الطبقات (الأعلى فوق)</h4>
               <sc-for list="{{ layerList }}" as="ly" hint-placeholder-count="3">
@@ -309,7 +330,8 @@
           <button onClick="{{ resetAll }}" class="btn" style="width:100%;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">استعادة الافتراضي</button>
         </div>
 
-        <div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:40px;">
+        <div class="edit-preview" style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:40px;">
+        <div class="edit-stage" ref="{{ stageRef }}" style="display:flex;align-items:center;justify-content:center;transform-origin:center center;">
 
           <sc-if value="{{ d.breaking_photo }}">
             <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
@@ -528,7 +550,7 @@
 
           <sc-if value="{{ d.custom }}">
             <div data-export-node="1" data-w="{{ cfg.w }}" data-h="{{ cfg.h }}" style="width:{{ cfg.dispW }}px;height:{{ cfg.dispH }}px;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);background:{{ cfg.bgColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;">
-              <sc-if value="{{ cfg.showImg }}"><image-slot id="custom_photo" fit="{{ cfg.imgFit }}" style="position:absolute;inset:0;width:100%;height:100%;z-index:{{ cfg.zImage }};transform:scale(var(--cimgS));transform-origin:center;" shape="rect" placeholder="اسحب الصورة"></image-slot></sc-if>
+              <sc-if value="{{ cfg.showImg }}"><div data-cimgframe="1" style="position:absolute;left:50%;top:50%;width:var(--cimgW);height:var(--cimgH);z-index:{{ cfg.zImage }};transform:translate(calc(-50% + var(--cimgPX)), calc(-50% + var(--cimgPY)));transform-origin:center;"><image-slot id="custom_photo" fit="{{ cfg.imgFit }}" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب الصورة"></image-slot><span data-cimgresize="1" data-ccorner="nw" style="position:absolute;left:-8px;top:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;z-index:40;"></span><span data-cimgresize="1" data-ccorner="ne" style="position:absolute;right:-8px;top:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;z-index:40;"></span><span data-cimgresize="1" data-ccorner="sw" style="position:absolute;left:-8px;bottom:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;z-index:40;"></span><span data-cimgresize="1" data-ccorner="se" style="position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;z-index:40;"></span></div></sc-if>
               <sc-if value="{{ cfg.showImg }}"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.45),transparent 55%);pointer-events:none;z-index:{{ cfg.zImage }};"></div></sc-if>
               <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
@@ -539,6 +561,7 @@
             </div>
           </sc-if>
 
+        </div>
         </div>
       </div>
     </div>
@@ -597,6 +620,9 @@
           <h4>نسخ احتياطي ومشاركة</h4>
           <span class="lab">صدّر كل إعداداتك وقوالبك كملف لمشاركتها أو نقلها لجهاز آخر</span>
           <button onClick="{{ exportSettings }}" class="btn" style="width:100%;background:#26312f;color:#f2d47e;border:1px solid #34403d;margin-top:8px;">⤓ تصدير الإعدادات (JSON)</button>
+          <span class="lab" style="margin-top:13px;">تثبيت المنشورات الحالية كنسخة افتراضية للتطبيق</span>
+          <button onClick="{{ exportSeed }}" class="btn" style="width:100%;background:var(--brick);color:#fdf6e3;margin-top:8px;">⭐ حفظ كنسخة التطبيق (seed.json)</button>
+          <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:6px;">ينزّل ملف seed.json — ضعه بجانب index.html قبل الرفع، فتفتح كل المنشورات جاهزة عند تثبيت التطبيق لأول مرة.</div>
           <span class="lab" style="margin-top:13px;">استيراد ملف إعدادات</span>
           <input type="file" accept="application/json,.json" onChange="{{ onImportSettings }}" style="color:#cfd6d8;font-size:12px;">
         </div>
@@ -719,15 +745,16 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     this.rootRef = React.createRef();
+    this.stageRef = React.createRef();
     this.defaults = { dark:"#1b2326", brick:"#c1624c", deep:"#b94126", cream:"#fdf6e3", gold:"#f2d47e" };
-    this.DEFAULTS_DS = { ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, radius:0, bar:true, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, showLogo:true, showFreq:true, showPhoto:true, headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.", ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.", guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب", program:"اسم البرنامج", host:"مع المذيع" };
+    this.DEFAULTS_DS = { ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, radius:0, bar:true, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, cimgW:100, cimgH:100, cimgPX:0, cimgPY:0, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, showLogo:true, showFreq:true, showPhoto:true, headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.", ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.", guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب", program:"اسم البرنامج", host:"مع المذيع" };
     this.state = {
       screen:"home", selected:null, settingsOpen:false, builderOpen:false, generatorOpen:false, ds:{}, templates:[], selPng:null, thumbs:{},
       genHeadline:"", genImage:"",
       customCfg:{ size:"1080x1080", bg:"dark", showImg:true, showBadge:false, showText:true, showLogo:true, pngs:[], imgFit:"cover", customW:1200, customH:800 },
       t:{...this.defaults}, radius:0, bar:true, font:"plex",
       showLogo:true, showFreq:true, showPhoto:true,
-      patUrl:null, ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, dateTop:14, dateLeft:7, dateFs:11,
+      patUrl:null, ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, cimgW:100, cimgH:100, cimgPX:0, cimgPY:0, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, dateTop:14, dateLeft:7, dateFs:11,
       station:"صوت البلد · من قلب حلب", fmLine:"FM 102.6 · من قلب حلب",
       gradBg:false, gradPat:false,
       autoDate:true, manualDate:"",
@@ -757,18 +784,24 @@ class Component extends DCLogic {
     };
   }
   componentDidMount(){
-    try{ const s=JSON.parse(localStorage.getItem("albalad-studio")||"null"); if(s){ this.setState(s,()=>{ this.migratePngs(); this.applyVars(); }); } }catch(e){}
+    let restored=false;
+    try{ const s=JSON.parse(localStorage.getItem("albalad-studio")||"null"); if(s){ restored=true; this.setState(s,()=>{ this.migratePngs(); this.applyVars(); }); } }catch(e){}
+    if(!restored){ try{ fetch("seed.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(o=>{ if(o&&typeof o==="object"){ this.setState(o,()=>{ this.migratePngs(); this.applyVars(); this.persist(); }); } }).catch(()=>{}); }catch(e){} }
     this.applyVars();
     const tick=()=>{ const d=new Date(); this.setState({clock:String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}); };
     tick(); this._t=setInterval(tick,20000);
-    this._onDown=(e)=>{ if(this.state.screen!=="edit")return; const rs=e.target.closest&&e.target.closest("[data-presize]"); if(rs){ e.preventDefault(); const i=+rs.getAttribute("data-presize"); const cont=rs.parentElement; const r=cont.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; const p=this.state.customCfg.pngs[i]; const s0=p?(p.s||1):1; const d0=Math.hypot(e.clientX-cx,e.clientY-cy)||1; this._presize={i,cont,cx,cy,s0,d0,ns:null}; return; } const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ const i=+pe.getAttribute("data-pidx"); const p=this.state.customCfg.pngs[i]; if(p){ e.preventDefault(); if(this.state.selPng!==i) this.setState({selPng:i}); this._pdrag={i,sx:e.clientX,sy:e.clientY,ox:p.x,oy:p.y,el:pe,nx:null}; } return; } const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; const k=el.getAttribute("data-mv"); e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); this._drag={k,el,node,sx:e.clientX,sy:e.clientY,ox:this.state[k+"X"]||0,oy:this.state[k+"Y"]||0,nx:null}; };
-    this._onMove=(e)=>{ if(this._presize){ const pr=this._presize; const d=Math.hypot(e.clientX-pr.cx,e.clientY-pr.cy); let ns=pr.s0*(d/pr.d0); ns=Math.max(0.2,Math.min(4,ns)); pr.ns=ns; pr.cont.style.width=(ns*120)+"px"; return; } if(this._pdrag){ const nx=this._pdrag.ox+(e.clientX-this._pdrag.sx), ny=this._pdrag.oy+(e.clientY-this._pdrag.sy); this._pdrag.el.style.marginLeft=nx+"px"; this._pdrag.el.style.marginTop=ny+"px"; this._pdrag.nx=nx; this._pdrag.ny=ny; return; } if(!this._drag)return; let nx=this._drag.ox+(e.clientX-this._drag.sx), ny=this._drag.oy+(e.clientY-this._drag.sy); const rt=this.rootRef.current; const TH=7; let snapV=false,snapH=false; const dr=this._drag; if(dr.node&&dr.el){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); const nr=dr.node.getBoundingClientRect(), er=dr.el.getBoundingClientRect(); const dx=(nr.left+nr.width/2)-(er.left+er.width/2); const dy=(nr.top+nr.height/2)-(er.top+er.height/2); if(Math.abs(dx)<TH){ nx+=dx; snapV=true; } if(Math.abs(dy)<TH){ ny+=dy; snapH=true; } } if(rt){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); } this.showGuides(dr.node,snapV,snapH); this._drag.nx=nx; this._drag.ny=ny; };
-    this._onUp=()=>{ if(this._presize){ const pr=this._presize; this._presize=null; if(pr.ns!=null) this.setPngScale(pr.i,pr.ns); return; } if(this._pdrag){ const pd=this._pdrag; this._pdrag=null; if(pd.nx!=null){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); pngs[pd.i]={...pngs[pd.i],x:Math.round(pd.nx),y:Math.round(pd.ny)}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); } return; } if(!this._drag)return; const k=this._drag.k,nx=this._drag.nx,ny=this._drag.ny; this._drag=null; this.hideGuides(); if(nx!=null) this.up({[k+"X"]:Math.round(nx),[k+"Y"]:Math.round(ny)}); };
+    this._onDown=(e)=>{ if(this.state.screen!=="edit")return; const cr=e.target.closest&&e.target.closest("[data-cimgresize]"); if(cr){ e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); const rect=node?node.getBoundingClientRect():{width:1,height:1}; this._cimgrz={corner:cr.getAttribute("data-ccorner")||"se",sx:e.clientX,sy:e.clientY,sw:this.state.cimgW||100,sh:this.state.cimgH||100,rw:rect.width||1,rh:rect.height||1,nw:null,nh:null}; return; } const rs=e.target.closest&&e.target.closest("[data-presize]"); if(rs){ e.preventDefault(); const i=+rs.getAttribute("data-presize"); const cont=rs.parentElement; const r=cont.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; const p=this.state.customCfg.pngs[i]; const s0=p?(p.s||1):1; const d0=Math.hypot(e.clientX-cx,e.clientY-cy)||1; this._presize={i,cont,cx,cy,s0,d0,ns:null}; return; } const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ const i=+pe.getAttribute("data-pidx"); const p=this.state.customCfg.pngs[i]; if(p){ e.preventDefault(); if(this.state.selPng!==i) this.setState({selPng:i}); this._pdrag={i,sx:e.clientX,sy:e.clientY,ox:p.x,oy:p.y,el:pe,nx:null}; } return; } const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; const k=el.getAttribute("data-mv"); e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); this._drag={k,el,node,sx:e.clientX,sy:e.clientY,ox:this.state[k+"X"]||0,oy:this.state[k+"Y"]||0,nx:null}; };
+    this._onMove=(e)=>{ if(this._cimgrz){ const z=this._cimgrz; const dxF=(e.clientX-z.sx)/z.rw*100, dyF=(e.clientY-z.sy)/z.rh*100; const sX=z.corner.indexOf("e")>=0?1:-1, sY=z.corner.indexOf("s")>=0?1:-1; let nw=Math.max(10,Math.min(220,z.sw+sX*dxF*2)); let nh=Math.max(10,Math.min(220,z.sh+sY*dyF*2)); z.nw=nw; z.nh=nh; const rt=this.rootRef.current; if(rt){ rt.style.setProperty("--cimgW",nw+"%"); rt.style.setProperty("--cimgH",nh+"%"); } return; } if(this._presize){ const pr=this._presize; const d=Math.hypot(e.clientX-pr.cx,e.clientY-pr.cy); let ns=pr.s0*(d/pr.d0); ns=Math.max(0.2,Math.min(4,ns)); pr.ns=ns; pr.cont.style.width=(ns*120)+"px"; return; } if(this._pdrag){ const nx=this._pdrag.ox+(e.clientX-this._pdrag.sx), ny=this._pdrag.oy+(e.clientY-this._pdrag.sy); this._pdrag.el.style.marginLeft=nx+"px"; this._pdrag.el.style.marginTop=ny+"px"; this._pdrag.nx=nx; this._pdrag.ny=ny; return; } if(!this._drag)return; let nx=this._drag.ox+(e.clientX-this._drag.sx), ny=this._drag.oy+(e.clientY-this._drag.sy); const rt=this.rootRef.current; const TH=7; let snapV=false,snapH=false; const dr=this._drag; if(dr.node&&dr.el){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); const nr=dr.node.getBoundingClientRect(), er=dr.el.getBoundingClientRect(); const dx=(nr.left+nr.width/2)-(er.left+er.width/2); const dy=(nr.top+nr.height/2)-(er.top+er.height/2); if(Math.abs(dx)<TH){ nx+=dx; snapV=true; } if(Math.abs(dy)<TH){ ny+=dy; snapH=true; } } if(rt){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); } this.showGuides(dr.node,snapV,snapH); this._drag.nx=nx; this._drag.ny=ny; };
+    this._onUp=()=>{ if(this._cimgrz){ const z=this._cimgrz; this._cimgrz=null; if(z.nw!=null) this.up({cimgW:Math.round(z.nw),cimgH:Math.round(z.nh)}); return; } if(this._presize){ const pr=this._presize; this._presize=null; if(pr.ns!=null) this.setPngScale(pr.i,pr.ns); return; } if(this._pdrag){ const pd=this._pdrag; this._pdrag=null; if(pd.nx!=null){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); pngs[pd.i]={...pngs[pd.i],x:Math.round(pd.nx),y:Math.round(pd.ny)}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); } return; } if(!this._drag)return; const k=this._drag.k,nx=this._drag.nx,ny=this._drag.ny; this._drag=null; this.hideGuides(); if(nx!=null) this.up({[k+"X"]:Math.round(nx),[k+"Y"]:Math.round(ny)}); };
     document.addEventListener("pointerdown",this._onDown); document.addEventListener("pointermove",this._onMove); document.addEventListener("pointerup",this._onUp);
     this._onWheel=(e)=>{ const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ e.preventDefault(); const i=+pe.getAttribute("data-pidx"); this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); const cur=pngs[i]; if(!cur)return null; let ns=(cur.s||1)-e.deltaY*0.0015; ns=Math.max(0.2,Math.min(4,ns)); pngs[i]={...cur,s:ns}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); return; } if(this.state.screen!=="edit")return; const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; e.preventDefault(); const k=el.getAttribute("data-mv"); let s=(this.state[k+"S"]||1)-e.deltaY*0.0015; s=Math.max(0.3,Math.min(3,s)); const rt=this.rootRef.current; if(rt) rt.style.setProperty("--"+k+"S",s); clearTimeout(this._wt); this._wt=setTimeout(()=>this.up({[k+"S"]:Math.round(s*100)/100}),260); };
     document.addEventListener("wheel",this._onWheel,{passive:false});
+    this._onResize=()=>this.fitStage(); window.addEventListener("resize",this._onResize);
+    this.fitStage();
   }
-  componentWillUnmount(){ clearInterval(this._t); document.removeEventListener("pointerdown",this._onDown); document.removeEventListener("pointermove",this._onMove); document.removeEventListener("pointerup",this._onUp); document.removeEventListener("wheel",this._onWheel); }
+  componentDidUpdate(){ this.fitStage(); }
+  fitStage(){ const st=this.stageRef&&this.stageRef.current; if(!st)return; const prev=st.parentElement; const node=st.querySelector("[data-export-node]"); if(!prev||!node){ st.style.transform=""; return; } const availW=prev.clientWidth-24, availH=prev.clientHeight-24; const nw=node.offsetWidth||1, nh=node.offsetHeight||1; let sc=Math.min(availW/nw, availH/nh, 1); if(!isFinite(sc)||sc<=0) sc=1; st.style.transform="scale("+sc+")"; }
+  componentWillUnmount(){ clearInterval(this._t); document.removeEventListener("pointerdown",this._onDown); document.removeEventListener("pointermove",this._onMove); document.removeEventListener("pointerup",this._onUp); document.removeEventListener("wheel",this._onWheel); window.removeEventListener("resize",this._onResize); }
   showGuides(node,v,h){
     if(!node){ this.hideGuides(); return; }
     if(!this._gv){ this._gv=document.createElement("div"); this._gv.style.cssText="position:fixed;width:0;border-left:1.5px dashed #f2d47e;z-index:9999;pointer-events:none;display:none;box-shadow:0 0 4px rgba(242,212,126,.6);"; document.body.appendChild(this._gv); }
@@ -804,6 +837,8 @@ class Component extends DCLogic {
     const pm=fa<=0?"none":(this.state.patFadeDir==="top"?("linear-gradient(to bottom, rgba(0,0,0,"+fEnd+") 0%, #000 100%)"):("linear-gradient(to bottom, #000 0%, rgba(0,0,0,"+fEnd+") 100%)"));
     r.style.setProperty("--patMask", pm);
     r.style.setProperty("--cimgS",this.state.cimgS||1);
+    r.style.setProperty("--cimgW",(this.state.cimgW||100)+"%"); r.style.setProperty("--cimgH",(this.state.cimgH||100)+"%");
+    r.style.setProperty("--cimgPX",(this.state.cimgPX||0)+"px"); r.style.setProperty("--cimgPY",(this.state.cimgPY||0)+"px");
     r.style.setProperty("--imgX",this.state.imgX+"px"); r.style.setProperty("--boxX",this.state.boxX+"px"); r.style.setProperty("--badgeX",this.state.badgeX+"px");
     r.style.setProperty("--logoX",this.state.logoX+"px"); r.style.setProperty("--logoY",this.state.logoY+"px"); r.style.setProperty("--fmX",this.state.fmX+"px"); r.style.setProperty("--fmY",this.state.fmY+"px");
     r.style.setProperty("--boxS",this.state.boxS); r.style.setProperty("--badgeS",this.state.badgeS); r.style.setProperty("--logoS",this.state.logoS); r.style.setProperty("--fmS",this.state.fmS);
@@ -881,7 +916,8 @@ class Component extends DCLogic {
   exportPng(){
     const node=this.rootRef.current && this.rootRef.current.querySelector("[data-export-node]");
     if(!node || !window.html2canvas){ alert("جارٍ تحميل أداة التصدير، حاول بعد لحظات."); return; }
-    const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}"; document.head.appendChild(st);
+    const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}[data-cimgresize]{display:none!important}"; document.head.appendChild(st);
+    const stg=this.stageRef&&this.stageRef.current; const stgT=stg?stg.style.transform:""; if(stg) stg.style.transform="";
     const w=+node.getAttribute("data-w")||node.offsetWidth;
     const q=Math.max(2,this.state.exportScale||3);
     const scale=(w/node.offsetWidth)*q;
@@ -890,21 +926,22 @@ class Component extends DCLogic {
     if(trans) node.style.background="transparent";
     window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:0}).then(c=>{
       const a=document.createElement("a"); a.download="albalad-"+this.state.selected+(trans?"-transparent":"")+".png"; a.href=c.toDataURL("image/png"); a.click();
-      node.style.background=prevBg; st.remove();
-    }).catch(()=>{ node.style.background=prevBg; st.remove(); });
+      node.style.background=prevBg; st.remove(); if(stg) stg.style.transform=stgT;
+    }).catch(()=>{ node.style.background=prevBg; st.remove(); if(stg) stg.style.transform=stgT; });
   }
   captureThumb(done){
     const sel=this.state.selected;
     const node=this.rootRef.current && this.rootRef.current.querySelector("[data-export-node]");
     if(!sel || !node || !window.html2canvas){ if(done)done(); return; }
-    const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}"; document.head.appendChild(st);
+    const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}[data-cimgresize]{display:none!important}"; document.head.appendChild(st);
+    const stg=this.stageRef&&this.stageRef.current; const stgT=stg?stg.style.transform:""; if(stg) stg.style.transform="";
     const scale=Math.min(1, 360/(node.offsetWidth||360));
     window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:0}).then(c=>{
       let url=""; try{ url=c.toDataURL("image/jpeg",0.7); }catch(e){}
-      st.remove();
+      st.remove(); if(stg) stg.style.transform=stgT;
       if(url){ this.setState(s=>({thumbs:{...(s.thumbs||{}),[sel]:url}}),()=>{ this.persist(); if(done)done(); }); }
       else if(done) done();
-    }).catch(()=>{ st.remove(); if(done)done(); });
+    }).catch(()=>{ st.remove(); if(stg) stg.style.transform=stgT; if(done)done(); });
   }
   leaveEdit(to){ if(this.state.screen==="edit"){ this.captureThumb(()=>this.setState({screen:to})); } else { this.setState({screen:to}); } }
   dates(){
@@ -940,6 +977,7 @@ class Component extends DCLogic {
     const selName=(list.find(x=>x.id===sel)||{}).name||"";
     return {
       rootRef:this.rootRef,
+      stageRef:this.stageRef,
       isHome:this.state.screen==="home", isPick:this.state.screen==="pick", isEdit:this.state.screen==="edit",
       isSettings:this.state.settingsOpen,
       isGenerator:this.state.generatorOpen,
@@ -962,7 +1000,7 @@ class Component extends DCLogic {
       cfg:(()=>{ const c=this.state.customCfg; let w,h; if(c.size==="custom"){ w=Math.max(200,Math.min(4000,parseInt(c.customW)||1200)); h=Math.max(200,Math.min(4000,parseInt(c.customH)||800)); } else { const a=c.size.split("x").map(Number); w=a[0]; h=a[1]; } const sc=470/Math.max(w,h); const t=this.state.t;
         const bgMap={dark:t.dark,brick:t.brick,deep:t.deep,cream:t.cream}; const bgSolid=bgMap[c.bg]||t.dark; const bgColor=(this.state.gradBg&&c.bg!=="cream")?("linear-gradient(155deg, rgba(255,255,255,.10) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 100%), "+bgSolid):bgSolid;
         const ord=this.effOrder(c); const zMap={}; ord.forEach((id,i)=>zMap[id]=i+1);
-        return {...c, w, h, dispW:Math.round(w*sc), dispH:Math.round(h*sc), bgColor, fgColor:c.bg==="cream"?t.dark:t.cream, logo:c.bg==="cream"?logoDark:logoLight, pngCount:c.pngs.length, zImage:zMap["image"]||0, zBadge:zMap["badge"]||0, zText:zMap["text"]||0, zLogo:zMap["logo"]||0, pngsR:c.pngs.map((p,i)=>({x:p.x,y:p.y,w:Math.round((p.s||1)*120),z:zMap["png:"+p.id]||(i+1),i,outline:this.state.selPng===i?"2px dashed #f2d47e":"none",selected:this.state.selPng===i,imgStyle:{width:"100%",aspectRatio:String(p.ar||1),backgroundImage:'url("'+p.url+'")',backgroundSize:"contain",backgroundRepeat:"no-repeat",backgroundPosition:"center",pointerEvents:"none"}})) }; })(),
+        return {...c, imgFit:(c.imgFit==="contain"?"contain":"cover"), w, h, dispW:Math.round(w*sc), dispH:Math.round(h*sc), bgColor, fgColor:c.bg==="cream"?t.dark:t.cream, logo:c.bg==="cream"?logoDark:logoLight, pngCount:c.pngs.length, zImage:zMap["image"]||0, zBadge:zMap["badge"]||0, zText:zMap["text"]||0, zLogo:zMap["logo"]||0, pngsR:c.pngs.map((p,i)=>({x:p.x,y:p.y,w:Math.round((p.s||1)*120),z:zMap["png:"+p.id]||(i+1),i,outline:this.state.selPng===i?"2px dashed #f2d47e":"none",selected:this.state.selPng===i,imgStyle:{width:"100%",aspectRatio:String(p.ar||1),backgroundImage:'url("'+p.url+'")',backgroundSize:"contain",backgroundRepeat:"no-repeat",backgroundPosition:"center",pointerEvents:"none"}})) }; })(),
       t:this.state.t, radius:this.state.radius, bar:this.state.bar,
       ptopOp:this.state.ptopOp, ptopSize:this.state.ptopSize, ptopY:this.state.ptopY, pbotOp:this.state.pbotOp, pbotSize:this.state.pbotSize, pbotY:this.state.pbotY, pboxOp:this.state.pboxOp, pboxSize:this.state.pboxSize,
       font:this.state.font,
@@ -1030,7 +1068,7 @@ class Component extends DCLogic {
       onCfgText:e=>this.setCfg({showText:e.target.checked}), onCfgLogo:e=>this.setCfg({showLogo:e.target.checked}),
       onCfgPngs:e=>this.addPngs(e.target.files),
       pngList:this.state.customCfg.pngs.map((p,i)=>({n:i+1, front:()=>this.pngToFront(i), del:()=>this.pngDel(i)})),
-      layerList:(()=>{ const c=this.state.customCfg; const names={image:"الصورة",badge:"شارة عاجل",text:"النص",logo:"اللوغو"}; const ord=this.effOrder(c); const pIdx={}; c.pngs.forEach((p,i)=>pIdx["png:"+p.id]=i); return ord.slice().reverse().map((id,k)=>{ const pi=(id in pIdx)?pIdx[id]:-1; const png=pi>=0?c.pngs[pi]:null; const isLogo=id==="logo"; const isImg=id==="image"; const ls=this.state.logoS||1; const cz=this.state.cimgS||1; const fitC=(c.imgFit||"cover")==="contain"; return { id, name: png?("صورة "+(pi+1)):(names[id]||id), top:k===0, bottom:k===ord.length-1, up:()=>this.moveLayer(id,1), down:()=>this.moveLayer(id,-1), isPng:!!png, isImg, fitLabel: fitC?"كامل الصورة":"يملأ الإطار", toggleFit:()=>this.setCfg({imgFit:fitC?"cover":"contain"}), resizable:!!png||isLogo||isImg, scale: png?(png.s||1):(isLogo?ls:(isImg?cz:1)), onScale: png?ev(v=>this.setPngScale(pi,parseFloat(v))):(isLogo?ev(v=>this.up({logoS:parseFloat(v)})):(isImg?ev(v=>this.up({cimgS:parseFloat(v)})):null)), bigger: png?(()=>this.setPngScale(pi,(png.s||1)+0.1)):(isLogo?(()=>this.up({logoS:Math.min(3,ls+0.1)})):(isImg?(()=>this.up({cimgS:Math.min(4,cz+0.1)})):null)), smaller: png?(()=>this.setPngScale(pi,(png.s||1)-0.1)):(isLogo?(()=>this.up({logoS:Math.max(0.3,ls-0.1)})):(isImg?(()=>this.up({cimgS:Math.max(0.5,cz-0.1)})):null)), del: png?(()=>this.pngDel(pi)):null }; }); })(),
+      layerList:(()=>{ const c=this.state.customCfg; const names={image:"الصورة",badge:"شارة عاجل",text:"النص",logo:"اللوغو"}; const ord=this.effOrder(c); const pIdx={}; c.pngs.forEach((p,i)=>pIdx["png:"+p.id]=i); return ord.slice().reverse().map((id,k)=>{ const pi=(id in pIdx)?pIdx[id]:-1; const png=pi>=0?c.pngs[pi]:null; const isLogo=id==="logo"; const isImg=id==="image"; const ls=this.state.logoS||1; const cz=this.state.cimgS||1; const fit=(c.imgFit||"cover")==="contain"?"contain":"cover"; const fitNext=fit==="cover"?"contain":"cover"; const fitLbl=fit==="cover"?"يملأ الإطار":"كامل الصورة"; return { id, name: png?("صورة "+(pi+1)):(names[id]||id), top:k===0, bottom:k===ord.length-1, up:()=>this.moveLayer(id,1), down:()=>this.moveLayer(id,-1), isPng:!!png, isImg, fitLabel: fitLbl, toggleFit:()=>this.setCfg({imgFit:fitNext}), resizable:!!png||isLogo||isImg, scale: png?(png.s||1):(isLogo?ls:(isImg?cz:1)), onScale: png?ev(v=>this.setPngScale(pi,parseFloat(v))):(isLogo?ev(v=>this.up({logoS:parseFloat(v)})):(isImg?ev(v=>this.up({cimgS:parseFloat(v)})):null)), bigger: png?(()=>this.setPngScale(pi,(png.s||1)+0.1)):(isLogo?(()=>this.up({logoS:Math.min(3,ls+0.1)})):(isImg?(()=>this.up({cimgS:Math.min(4,cz+0.1)})):null)), smaller: png?(()=>this.setPngScale(pi,(png.s||1)-0.1)):(isLogo?(()=>this.up({logoS:Math.max(0.3,ls-0.1)})):(isImg?(()=>this.up({cimgS:Math.max(0.5,cz-0.1)})):null)), del: png?(()=>this.pngDel(pi)):null }; }); })(),
       bold:this.state.bold,
       headScale:this.state.headScale, txtAlign:this.state.txtAlign, txtPad:this.state.txtPad,
       onBold:e=>this.up({bold:e.target.checked}),
@@ -1040,6 +1078,13 @@ class Component extends DCLogic {
       imgScale:this.state.imgScale, onImgScale:ev(v=>this.up({imgScale:parseFloat(v)})),
       hasPhoto:["breaking_photo","text_photo","square","story","full_screen","audiogram"].includes(sel),
       isCustomSel:sel==="custom",
+      cImgOn:sel==="custom" && !!this.state.customCfg.showImg,
+      cimgW:this.state.cimgW, cimgH:this.state.cimgH, cimgPX:this.state.cimgPX, cimgPY:this.state.cimgPY, cimgS:this.state.cimgS,
+      onCimgW:ev(v=>this.up({cimgW:parseInt(v)})), onCimgH:ev(v=>this.up({cimgH:parseInt(v)})),
+      onCimgSize:ev(v=>this.up({cimgW:parseInt(v),cimgH:parseInt(v)})),
+      onCimgPX:ev(v=>this.up({cimgPX:parseInt(v)})), onCimgPY:ev(v=>this.up({cimgPY:parseInt(v)})),
+      onCimgS:ev(v=>this.up({cimgS:parseFloat(v)})),
+      cimgReset:()=>this.up({cimgW:100,cimgH:100,cimgPX:0,cimgPY:0,cimgS:1}),
       selPng:this.state.selPng,
       hasSelPng:this.state.selPng!=null && !!this.state.customCfg.pngs[this.state.selPng],
       noSelPng:!(this.state.selPng!=null && !!this.state.customCfg.pngs[this.state.selPng]),
@@ -1067,6 +1112,7 @@ class Component extends DCLogic {
       })),
       schedAdd:()=>this.setState(s=>({schedule:[...s.schedule,{name:"برنامج جديد",host:"المذيع",time:"00:00"}]}),()=>this.persist()),
       exportSettings:()=>this.exportSettings(),
+      exportSeed:()=>this.exportSeed(),
       onImportSettings:e=>this.importSettings(e.target.files[0])
     };
   }
@@ -1077,6 +1123,14 @@ class Component extends DCLogic {
     const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="albalad-identity-settings.json"; a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }
+  exportSeed(){
+    const keys=["t","font","patUrl","dateTop","dateLeft","dateFs","station","fmLine","gradBg","gradPat","autoDate","manualDate","logoLight","logoDark","logoWhite","fmWhite","fmBrick","fmDark","ds","templates","carSlides","wCity","wTemp","wCond","wHi","wLo","wIcon","mLeague","mTeamA","mTeamB","mScoreA","mScoreB","mStatus","schedule","customCfg","thumbs"];
+    const out={}; keys.forEach(k=>out[k]=this.state[k]);
+    const blob=new Blob([JSON.stringify(out)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="seed.json"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    alert("تم تنزيل seed.json — ضعه بجانب index.html قبل الرفع، وستفتح المنشورات جاهزة عند تثبيت التطبيق لأول مرة.");
   }
   importSettings(file){
     if(!file) return; const r=new FileReader();

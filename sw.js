@@ -1,7 +1,8 @@
-// Service worker for راديو البلد studio PWA — offline-first runtime cache.
-const CACHE = 'albalad-studio-v2';
+// Service worker for راديو البلد studio PWA.
+// Network-first for the app code (HTML/JS/JSON) so updates always propagate;
+// cache-first for static media (images/fonts) for speed + offline.
+const CACHE = 'albalad-studio-v3';
 
-// Pre-cache the app shell so first offline launch works.
 const SHELL = [
   './',
   './index.html',
@@ -30,28 +31,37 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache-first for GET requests, network fallback that also fills the cache.
-// Navigations fall back to the cached app shell so the installed app always
-// opens, even offline or on a root URL.
+function networkFirst(req) {
+  return fetch(req).then((res) => {
+    if (res && res.status === 200) {
+      const copy = res.clone();
+      caches.open(CACHE).then((c) => c.put(req, copy).catch(() => {}));
+    }
+    return res;
+  }).catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')));
+}
+
+function cacheFirst(req) {
+  return caches.match(req).then((hit) => {
+    if (hit) return hit;
+    return fetch(req).then((res) => {
+      if (res && res.status === 200 && (res.type === 'basic' || res.type === 'cors')) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy).catch(() => {}));
+      }
+      return res;
+    });
+  });
+}
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
-  if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req).catch(() => caches.match('./index.html').then((r) => r || caches.match('./')))
-    );
+  // App code & navigations → always try the network first so edits show up.
+  if (req.mode === 'navigate' || /\.(html|js|json|webmanifest)(\?|$)/i.test(new URL(req.url).pathname)) {
+    e.respondWith(networkFirst(req));
     return;
   }
-  e.respondWith(
-    caches.match(req).then((hit) => {
-      if (hit) return hit;
-      return fetch(req).then((res) => {
-        if (res && res.status === 200 && (res.type === 'basic' || res.type === 'cors')) {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy).catch(() => {}));
-        }
-        return res;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
+  // Static media (images, fonts) → cache-first.
+  e.respondWith(cacheFirst(req));
 });
