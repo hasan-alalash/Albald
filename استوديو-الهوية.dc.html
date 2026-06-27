@@ -9,6 +9,19 @@
 <x-dc>
 <helmet>
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script>
+  // Keep only the locked viewport meta (some engines honor the FIRST one parsed).
+  (function(){
+    try{
+      var want="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover";
+      var metas=document.querySelectorAll('meta[name="viewport"]');
+      for(var i=0;i<metas.length-1;i++){ metas[i].parentNode.removeChild(metas[i]); }
+      var last=document.querySelector('meta[name="viewport"]');
+      if(last) last.setAttribute("content",want);
+    }catch(e){}
+  })();
+</script>
 <meta name="theme-color" content="#1b2326">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,9 +49,10 @@
 </script>
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;background:#cfc9bb;}
+  html,body{margin:0;background:#cfc9bb;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   @keyframes crawl{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   @keyframes livepulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+  [data-mv="box"], [data-mv="box"] p{ word-spacing: var(--wordSp, normal); line-height: var(--lineH, 1.65) !important; }
   .lab{font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:12px;color:#aeb6b8;display:block;margin-bottom:5px;}
   .ic{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;padding:8px 10px;border-radius:7px;border:1px solid #3a4448;background:#222b2f;color:#fdf6e3;width:100%;}
   .grp{background:#212a2e;border:1px solid #313b3f;border-radius:11px;padding:14px 15px;margin-bottom:12px;}
@@ -51,9 +65,13 @@
   image-slot{display:block;}
   @media (max-width:760px){
     .edit-body{flex-direction:column !important;}
-    .edit-preview{order:-1;height:46vh;flex:none !important;position:sticky;top:0;z-index:6;background:#d6d0c3;padding:14px !important;box-shadow:0 3px 10px rgba(0,0,0,.18);}
+    .edit-preview{order:-1;height:44svh;min-height:240px;flex:none !important;position:sticky;top:0;z-index:6;background:#d6d0c3;padding:12px !important;box-shadow:0 3px 10px rgba(0,0,0,.18);}
     .edit-panel{width:100% !important;max-height:none !important;}
+    /* 16px on form controls stops iOS Safari from auto-zooming when a field is focused */
+    .ic,textarea.ic,select.ic,input.ic{font-size:16px !important;}
+    .btn{font-size:15px;}
   }
+  input,textarea,select,button{touch-action:manipulation;}
 </style>
 </helmet>
 <div dir="rtl" ref="{{ rootRef }}" style="--dark:#1b2326;--brick:#c1624c;--deep:#b94126;--cream:#fdf6e3;--gold:#f2d47e;--radius:0px;--barH:7px;--patURL:url(assets/pattern-soft.png);--patURLalt:url(assets/pattern-brick.png);--logoLight:url(assets/logo-white.png);--logoDark:url(assets/logo-main.png);--customLogo:url(assets/logo-white.png);--logoCur:url(assets/logo-brick.png);--ptopOp:0.9;--ptopSize:130%;--ptopY:0px;--pbotOp:0.9;--pbotSize:130%;--pbotY:0px;--pboxOp:0.5;--pboxSize:85%;--txtAlign:justify;--headScale:1;--txtPad:28px;--imgY:0px;--boxY:0px;--badgeY:0px;--dateTop:14%;--dateLeft:7%;--dateW:36%;--dateFs:11px;--bodyW:400;--fontHead:'IBM Plex Sans Arabic';--fontBody:'IBM Plex Sans Arabic';font-family:var(--fontBody),sans-serif;font-weight:var(--bodyW);min-height:100vh;">
@@ -67,6 +85,31 @@
       <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:42px;margin-top:30px;">استوديو الهوية البصرية</div>
       <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);font-size:18px;margin-top:8px;letter-spacing:1px;">{{ fmLine }}</div>
       <button onClick="{{ goPick }}" class="btn" style="position:relative;background:var(--brick);color:var(--cream);font-size:18px;padding:15px 46px;margin-top:38px;">اختر تصميماً ←</button>
+      <button onClick="{{ openTour }}" style="position:relative;margin-top:16px;background:none;border:none;color:#8a9295;font-family:var(--fontHead),sans-serif;font-weight:600;font-size:14px;cursor:pointer;text-decoration:underline;">؟ كيف يعمل الاستوديو</button>
+    </div>
+  </sc-if>
+
+  <!-- ================= TOUR ================= -->
+  <sc-if value="{{ showTour }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:120;background:rgba(10,14,16,.74);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="background:#1b2326;border:1px solid #313b3f;border-radius:16px;padding:30px 28px;width:520px;max-width:100%;box-shadow:0 18px 50px rgba(0,0,0,.5);">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:18px;">
+          <div style="width:54px;height:36px;background:var(--logoCur) center/contain no-repeat;flex:none;"></div>
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:21px;">أهلاً بك في استوديو الهوية</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:15px;">
+          <sc-for list="{{ tourSteps }}" as="ts" hint-placeholder-count="4">
+            <div style="display:flex;gap:13px;align-items:flex-start;">
+              <div style="width:34px;height:34px;flex:none;border-radius:9px;background:#26312f;border:1px solid #34403d;display:flex;align-items:center;justify-content:center;font-size:17px;">{{ ts.icon }}</div>
+              <div>
+                <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:15px;">{{ ts.title }}</div>
+                <div style="font-family:var(--fontHead),sans-serif;font-weight:500;color:#9aa2a4;font-size:13px;line-height:1.7;margin-top:2px;">{{ ts.body }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{ closeTour }}" class="btn" style="width:100%;margin-top:24px;background:var(--brick);color:#fdf6e3;font-size:15px;">فهمت، لنبدأ ←</button>
+      </div>
     </div>
   </sc-if>
 
@@ -79,7 +122,38 @@
         <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:19px;">اختر التصميم الذي تريد تعديله</div>
         <button onClick="{{ openSettings }}" class="btn" style="margin-right:auto;background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 16px;">⚙ الإعدادات</button>
       </div>
-      <div style="padding:34px 30px;display:flex;flex-wrap:wrap;gap:24px;">
+      <div style="padding:20px 30px 0;">
+        <div style="background:#fff;border:1px solid #d8d0bd;border-radius:12px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+          <div style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:14px;color:#1b2326;margin-bottom:11px;">✍️ خبر سريع — اكتب النص وارفع صورة، يُطبّقان على كل قوالب الخبر دفعةً واحدة</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <textarea value="{{ quickHeadline }}" onInput="{{ onQuickHeadline }}" placeholder="اكتب نص الخبر هنا..." style="flex:1;min-width:240px;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;padding:9px 11px;border-radius:8px;border:1px solid #cdc4af;background:#faf7ef;color:#1b2326;resize:vertical;min-height:46px;line-height:1.6;"></textarea>
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;background:#faf7ef;border:1px solid #cdc4af;border-radius:8px;padding:10px 14px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:13px;color:#1b2326;">
+              <span>🖼️ {{ quickImgLabel }}</span>
+              <input type="file" accept="image/*" onChange="{{ onQuickImage }}" style="display:none;">
+            </label>
+            <button onClick="{{ applyQuickNews }}" class="btn" style="background:var(--brick);color:#fdf6e3;">طبّق على الكل ←</button>
+          </div>
+        </div>
+      </div>
+      <div style="padding:24px 30px 34px;display:flex;flex-wrap:wrap;gap:24px;">
+        <sc-if value="{{ hasRecent }}">
+          <div style="width:100%;margin-bottom:4px;">
+            <div style="font-family:var(--fontHead),sans-serif;font-weight:700;font-size:13px;color:#7a7158;margin-bottom:13px;letter-spacing:.5px;">↻ آخر ما استُخدم</div>
+            <div style="display:flex;flex-wrap:wrap;gap:16px;">
+              <sc-for list="{{ recentDesigns }}" as="rz" hint-placeholder-count="0">
+                <div onClick="{{ rz.open }}" style="flex:none;width:150px;cursor:pointer;">
+                  <div style="height:108px;border-radius:9px;overflow:hidden;background:var(--dark);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;">
+                    <sc-if value="{{ rz.hasThumb }}"><div style="{{ rz.thumbStyle }}"></div></sc-if>
+                    <sc-if value="{{ rz.noThumb }}"><div style="position:relative;width:46px;height:30px;background:var(--logoCur) center/contain no-repeat;opacity:.9;"></div></sc-if>
+                    <span style="position:absolute;top:0;right:0;left:0;height:4px;background:var(--gold);"></span>
+                  </div>
+                  <div style="font-family:var(--fontHead),sans-serif;font-weight:600;font-size:12px;color:#1b2326;margin-top:7px;">{{ rz.name }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="height:1px;background:#cfc7b4;margin:26px 0 2px;"></div>
+          </div>
+        </sc-if>
         <sc-for list="{{ designs }}" as="dz" hint-placeholder-count="0">
           <div onClick="{{ dz.open }}" style="flex:none;width:210px;cursor:pointer;">
             <div style="height:150px;border-radius:10px;overflow:hidden;background:var(--dark);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;">
@@ -139,12 +213,41 @@
         <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:#fdf6e3;font-size:18px;">{{ selName }}</div>
         <button onClick="{{ openSettings }}" class="btn" style="margin-right:auto;background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">⚙ الإعدادات</button>
         <button onClick="{{ saveTpl }}" class="btn" style="background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">★ حفظ كقالب</button>
+        <button onClick="{{ copyImg }}" class="btn" style="background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">⧉ نسخ</button>
+        <button onClick="{{ shareImg }}" class="btn" style="background:#2a3338;color:#f2d47e;font-size:14px;padding:9px 15px;">↗ مشاركة</button>
         <button onClick="{{ exportPng }}" class="btn" style="background:var(--brick);color:#fdf6e3;font-size:14px;padding:9px 20px;">⤓ حفظ بدقة عالية</button>
       </div>
       <div class="edit-body" style="display:flex;flex:1;align-items:stretch;">
         <div class="edit-panel" style="width:300px;flex:none;background:#1b2326;padding:18px 16px;overflow:auto;max-height:calc(100vh - 56px);">
+          <button onClick="{{ toggleAdv }}" class="btn" style="width:100%;margin-bottom:14px;background:{{ advBtnBg }};color:{{ advBtnFg }};border:1px solid #34403d;font-size:14px;padding:11px;">{{ advBtnLabel }}</button>
+          <sc-if value="{{ adv }}">
+          <sc-if value="{{ bgToggle }}">
+          <div class="grp">
+            <h4>خلفية التصميم</h4>
+            <span class="lab" style="margin-bottom:8px;">اختر لون الخلفية — يتبدّل اللوغو والتردد تلقائياً</span>
+            <div style="display:flex;gap:10px;">
+              <button onClick="{{ setBgDark }}" style="flex:1;cursor:pointer;border-radius:9px;padding:12px 6px;border:2px solid {{ bgDarkBorder }};background:#1b2326;color:#fdf6e3;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:7px;">
+                <span style="width:30px;height:20px;border-radius:4px;background:#1b2326;border:1px solid #4a5559;"></span>داكن
+              </button>
+              <button onClick="{{ setBgBrick }}" style="flex:1;cursor:pointer;border-radius:9px;padding:12px 6px;border:2px solid {{ bgBrickBorder }};background:#2a3338;color:#fdf6e3;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:7px;">
+                <span style="width:30px;height:20px;border-radius:4px;background:#c1624c;border:1px solid #d98a76;"></span>طوبي
+              </button>
+            </div>
+          </div>
+          </sc-if>
           <div class="grp">
             <h4>الألوان</h4>
+            <span class="lab" style="margin-bottom:7px;">ألوان الهوية الأساسية — استعادة</span>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:13px;">
+              <sc-for list="{{ palettes }}" as="pal" hint-placeholder-count="5">
+                <div onClick="{{ pal.apply }}" title="{{ pal.name }}" style="cursor:pointer;border:1px solid #3a4448;border-radius:8px;overflow:hidden;width:52px;">
+                  <div style="display:flex;height:20px;">
+                    <span style="flex:1;background:{{ pal.c0 }};"></span><span style="flex:1;background:{{ pal.c1 }};"></span><span style="flex:1;background:{{ pal.c2 }};"></span><span style="flex:1;background:{{ pal.c3 }};"></span>
+                  </div>
+                  <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:9px;color:#aeb6b8;text-align:center;padding:3px 0;background:#222b2f;">{{ pal.name }}</div>
+                </div>
+              </sc-for>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <div><span class="lab">داكن</span><input type="color" class="col" value="{{ t.dark }}" onInput="{{ onDark }}"></div>
               <div><span class="lab">طوبي</span><input type="color" class="col" value="{{ t.brick }}" onInput="{{ onBrick }}"></div>
@@ -159,6 +262,16 @@
               <label class="ck"><input type="checkbox" checked="{{ showLogo }}" onChange="{{ onShowLogo }}"> إظهار اللوغو</label>
               <label class="ck"><input type="checkbox" checked="{{ showFreq }}" onChange="{{ onShowFreq }}"> إظهار التردد / FM</label>
               <label class="ck"><input type="checkbox" checked="{{ showPhoto }}" onChange="{{ onShowPhoto }}"> إظهار الصورة</label>
+              <sc-if value="{{ isBreakingType }}"><label class="ck"><input type="checkbox" checked="{{ showBadge }}" onChange="{{ onShowBadge }}"> إظهار شارة «عاجل»</label></sc-if>
+              <sc-if value="{{ canScrim }}"><label class="ck"><input type="checkbox" checked="{{ textScrim }}" onChange="{{ onTextScrim }}"> تظليل خلف النص (لوضوح النص فوق الصورة)</label></sc-if>
+            </div>
+            <sc-if value="{{ scrimOn }}"><span class="lab" style="margin-top:11px;">قوة التظليل (×{{ scrimAmt }})</span><input type="range" class="rng" min="0.15" max="1.4" step="0.05" value="{{ scrimAmt }}" onInput="{{ onScrimAmt }}"></sc-if>
+            <sc-if value="{{ isBoxWidth }}"><span class="lab" style="margin-top:11px;">عرض المربع ({{ boxW }}%)</span><input type="range" class="rng" min="55" max="100" step="1" value="{{ boxW }}" onInput="{{ onBoxW }}"></sc-if>
+            <span class="lab" style="margin-top:13px;">لون اللوغو والتردد</span>
+            <div style="display:flex;gap:7px;margin-top:6px;">
+              <button onClick="{{ setToneAuto }}" style="flex:1;cursor:pointer;border-radius:8px;padding:9px 4px;border:2px solid {{ toneAutoB }};background:#222b2f;color:#fdf6e3;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:12px;">تلقائي</button>
+              <button onClick="{{ setToneGold }}" style="flex:1;cursor:pointer;border-radius:8px;padding:9px 4px;border:2px solid {{ toneGoldB }};background:#222b2f;color:#f2d47e;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:12px;">ذهبي</button>
+              <button onClick="{{ setToneBrick }}" style="flex:1;cursor:pointer;border-radius:8px;padding:9px 4px;border:2px solid {{ toneBrickB }};background:#222b2f;color:#cf7d68;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:12px;">طوبي</button>
             </div>
           </div>
           <div class="grp">
@@ -174,8 +287,7 @@
             <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:13px 0 6px;">▢ نقشة مربّع النص</div>
             <span class="lab">الشدّة</span><input type="range" class="rng" min="0" max="2" step="0.05" value="{{ pboxOp }}" onInput="{{ onPboxOp }}">
             <span class="lab" style="margin-top:7px;">الحجم</span><input type="range" class="rng" min="40" max="200" step="2" value="{{ pboxSize }}" onInput="{{ onPboxSize }}">
-            <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:13px 0 6px;">⬗ تدرّج/تلاشي النقشة</div>
-            <span class="lab">الاتجاه</span><select class="ic" value="{{ patFadeDir }}" onChange="{{ onPatFadeDir }}"><option value="bottom">تلاشٍ نحو الأسفل</option><option value="top">تلاشٍ نحو الأعلى</option></select>
+            <div style="font-family:'IBM Plex Sans Arabic';font-weight:700;font-size:12px;color:#c98a78;margin:13px 0 6px;">⬗ تدرّج/تلاشي النقشة (أعلى وأسفل)</div>
             <span class="lab" style="margin-top:7px;">شدّة التلاشي</span><input type="range" class="rng" min="0" max="1" step="0.05" value="{{ patFadeAmt }}" onInput="{{ onPatFadeAmt }}">
             <hr style="border:none;border-top:1px solid #313b3f;margin:14px 0;">
             <span class="lab">استدارة الزوايا</span><input type="range" class="rng" min="0" max="32" step="1" value="{{ radius }}" onInput="{{ onRadius }}">
@@ -186,19 +298,34 @@
             <select class="ic" value="{{ font }}" onChange="{{ onFont }}"><option value="plex">IBM Plex Sans Arabic</option><option value="cairo">Cairo + Tajawal</option><option value="tajawal">Tajawal</option><option value="reem">Reem Kufi + Cairo</option></select>
             <label class="ck" style="margin-top:12px;"><input type="checkbox" checked="{{ bold }}" onChange="{{ onBold }}"> خط عريض (Bold)</label>
           </div>
+          </sc-if>
+          <sc-if value="{{ hasTextFields }}">
           <div class="grp">
             <h4>النصوص</h4>
-            <span class="lab">حجم النص</span><input type="range" class="rng" min="0.6" max="1.8" step="0.02" value="{{ headScale }}" onInput="{{ onHeadScale }}">
+            <sc-if value="{{ fHeadline }}"><span class="lab">{{ headlineLabel }}</span><textarea class="ic" rows="4" style="resize:vertical;line-height:1.75;min-height:104px;" value="{{ headline }}" onInput="{{ onHeadline }}"></textarea>
+            <span class="lab" style="margin-top:11px;">حجم النص (×{{ headScale }})</span><input type="range" class="rng" min="0.6" max="3" step="0.02" value="{{ headScale }}" onInput="{{ onHeadScale }}"></sc-if>
+            <sc-if value="{{ fTicker }}"><span class="lab" style="margin-top:10px;">الشريط المتحرك</span><textarea class="ic" rows="3" style="resize:vertical;line-height:1.7;min-height:78px;" value="{{ ticker }}" onInput="{{ onTicker }}"></textarea></sc-if>
+            <sc-if value="{{ fGuest }}"><span class="lab" style="margin-top:10px;">اسم الضيف</span><input type="text" class="ic" value="{{ guest }}" onInput="{{ onGuest }}"></sc-if>
+            <sc-if value="{{ fGuestTitle }}"><span class="lab" style="margin-top:10px;">صفة الضيف</span><input type="text" class="ic" value="{{ guestTitle }}" onInput="{{ onGuestTitle }}"></sc-if>
+            <sc-if value="{{ fProgram }}"><span class="lab" style="margin-top:10px;">اسم البرنامج</span><input type="text" class="ic" value="{{ program }}" onInput="{{ onProgram }}"></sc-if>
+            <sc-if value="{{ fHost }}"><span class="lab" style="margin-top:10px;">المذيع</span><input type="text" class="ic" value="{{ host }}" onInput="{{ onHost }}"></sc-if>
+            <sc-if value="{{ fAgLabel }}"><span class="lab" style="margin-top:10px;">عنوان الأوديوغرام (الأعلى)</span><input type="text" class="ic" value="{{ agLabel }}" onInput="{{ onAgLabel }}"></sc-if>
+          </div>
+          </sc-if>
+          <sc-if value="{{ adv }}">
+          <div class="grp">
+            <h4>تنسيق النص</h4>
+            <label class="ck" style="margin-bottom:11px;"><input type="checkbox" checked="{{ autoFit }}" onChange="{{ onAutoFit }}"> ملاءمة تلقائية للنص الطويل</label>
+            <span class="lab">حجم النص</span><input type="range" class="rng" min="0.6" max="3" step="0.02" value="{{ headScale }}" onInput="{{ onHeadScale }}">
             <span class="lab" style="margin-top:9px;">محاذاة النص</span><select class="ic" value="{{ txtAlign }}" onChange="{{ onTxtAlign }}"><option value="justify">ضبط (Justify)</option><option value="right">يمين</option><option value="center">وسط</option></select>
             <span class="lab" style="margin-top:9px;">هوامش النص</span><input type="range" class="rng" min="6" max="80" step="1" value="{{ txtPad }}" onInput="{{ onTxtPad }}">
-            <span class="lab" style="margin-top:10px;">عنوان الخبر</span><input type="text" class="ic" value="{{ headline }}" onInput="{{ onHeadline }}">
-            <span class="lab" style="margin-top:10px;">الشريط المتحرك</span><input type="text" class="ic" value="{{ ticker }}" onInput="{{ onTicker }}">
-            <span class="lab" style="margin-top:10px;">اسم الضيف</span><input type="text" class="ic" value="{{ guest }}" onInput="{{ onGuest }}">
-            <span class="lab" style="margin-top:10px;">صفة الضيف</span><input type="text" class="ic" value="{{ guestTitle }}" onInput="{{ onGuestTitle }}">
-            <span class="lab" style="margin-top:10px;">اسم البرنامج</span><input type="text" class="ic" value="{{ program }}" onInput="{{ onProgram }}">
-            <span class="lab" style="margin-top:10px;">المذيع</span><input type="text" class="ic" value="{{ host }}" onInput="{{ onHost }}">
-            <span class="lab" style="margin-top:10px;">عنوان الأوديوغرام (الأعلى)</span><input type="text" class="ic" value="{{ agLabel }}" onInput="{{ onAgLabel }}">
+            <span class="lab" style="margin-top:9px;">تقارب الكلمات ({{ wordSp }})</span><input type="range" class="rng" min="-12" max="18" step="1" value="{{ wordSp }}" onInput="{{ onWordSp }}">
+            <span class="lab" style="margin-top:9px;">ارتفاع الأسطر (×{{ lineH }})</span><input type="range" class="rng" min="1" max="2.6" step="0.05" value="{{ lineH }}" onInput="{{ onLineH }}">
+            <sc-if value="{{ fHeadline }}">
+              <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:9px;">ℹ️ عند اختيار محاذاة «ضبط» تُملأ الأسطر بالكشيدة (مطّ الحروف الموصولة) تلقائياً بدل تباعد الكلمات — حسب قواعد الخط العربي.</div>
+            </sc-if>
           </div>
+          </sc-if>
           <sc-if value="{{ isCarousel }}">
             <div class="grp">
               <h4>محتوى الشريحة الحالية</h4>
@@ -262,8 +389,10 @@
                 <button onClick="{{ slotReplace }}" class="btn" style="flex:1;background:#26312f;color:#f2d47e;border:1px solid #34403d;">⟳ استبدال</button>
                 <button onClick="{{ slotClear }}" class="btn" style="flex:1;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">🗑 حذف</button>
               </div>
-              <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:9px;">💡 الإطار ثابت — لتكبير الصورة أو تحريكها داخله: <b style="color:#cfd6d8;">انقر مرتين</b> على الصورة ثم اسحبها أو اسحب الزوايا. الإطار لا يتحرك.</div>
-              <span class="lab" style="margin-top:12px;">حجم الإطار (×{{ imgScale }})</span><input type="range" class="rng" min="0.5" max="2" step="0.05" value="{{ imgScale }}" onInput="{{ onImgScale }}">
+              <sc-if value="{{ isNewsPhoto }}"><div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:9px;">💡 <b style="color:#cfd6d8;">اسحب الصورة مباشرةً</b> على التصميم لتحريكها، أو استخدم المنزلقات بالأسفل. «حجم الصورة» يكبّرها، والموضع يحرّكها.</div></sc-if>
+              <sc-if value="{{ notNewsPhoto }}"><div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-top:9px;">💡 الإطار ثابت — لتكبير الصورة أو تحريكها داخله: <b style="color:#cfd6d8;">انقر مرتين</b> على الصورة ثم اسحبها أو اسحب الزوايا. الإطار لا يتحرك.</div></sc-if>
+              <sc-if value="{{ isNewsPhoto }}"><span class="lab" style="margin-top:12px;">حجم الصورة (تكبير ×{{ imgScale }})</span><input type="range" class="rng" min="0.5" max="3" step="0.05" value="{{ imgScale }}" onInput="{{ onImgScale }}"><span class="lab" style="margin-top:10px;">موضع الصورة (أفقي)</span><input type="range" class="rng" min="-160" max="160" step="2" value="{{ imgX }}" onInput="{{ onImgX }}"><span class="lab" style="margin-top:10px;">موضع الصورة (عمودي)</span><input type="range" class="rng" min="-160" max="160" step="2" value="{{ imgY }}" onInput="{{ onImgY }}"></sc-if>
+              <sc-if value="{{ notNewsPhoto }}"><span class="lab" style="margin-top:12px;">حجم الإطار (×{{ imgScale }})</span><input type="range" class="rng" min="0.5" max="2" step="0.05" value="{{ imgScale }}" onInput="{{ onImgScale }}"></sc-if>
             </div>
           </sc-if>
           <sc-if value="{{ isCustomSel }}">
@@ -285,7 +414,7 @@
             <sc-if value="{{ cImgOn }}">
             <div class="grp">
               <h4>صورة الخلفية — الحجم والموضع</h4>
-              <span class="lab">الحجم ({{ cimgW }}%)</span><input type="range" class="rng" min="20" max="160" step="1" value="{{ cimgW }}" onInput="{{ onCimgSize }}">
+              <span class="lab">الحجم ({{ cimgW }}%)</span><input type="range" class="rng" min="20" max="240" step="1" value="{{ cimgW }}" onInput="{{ onCimgSize }}">
               <span class="lab" style="margin-top:8px;">الموضع (أفقي)</span><input type="range" class="rng" min="-300" max="300" step="2" value="{{ cimgPX }}" onInput="{{ onCimgPX }}">
               <span class="lab" style="margin-top:8px;">الموضع (عمودي)</span><input type="range" class="rng" min="-300" max="300" step="2" value="{{ cimgPY }}" onInput="{{ onCimgPY }}">
               <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.6;margin-top:8px;">💡 أو اسحب الزوايا الذهبية مباشرةً على التصميم لتغيير المساحة. الصورة تحافظ على نسبها دائماً.</div>
@@ -317,6 +446,7 @@
               <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.6;margin-top:4px;">العنصر في الأعلى يظهر فوق البقية. للصور: حرّك المؤشّر لتغيير الحجم.</div>
             </div>
           </sc-if>
+          <sc-if value="{{ adv }}">
           <div class="grp">
             <h4>المواضع (لأعلى / لأسفل)</h4>
             <span class="lab" style="margin-top:8px;">موضع النص</span><input type="range" class="rng" min="-220" max="220" step="2" value="{{ boxY }}" onInput="{{ onBoxY }}">
@@ -328,17 +458,18 @@
             <label class="ck" style="margin-top:12px;"><input type="checkbox" checked="{{ exportTransparent }}" onChange="{{ onExportTransparent }}"> خلفية شفافة (PNG)</label>
           </div>
           <button onClick="{{ resetAll }}" class="btn" style="width:100%;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">استعادة الافتراضي</button>
+          </sc-if>
         </div>
 
         <div class="edit-preview" style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:40px;">
         <div class="edit-stage" ref="{{ stageRef }}" style="display:flex;align-items:center;justify-content:center;transform-origin:center center;">
 
           <sc-if value="{{ d.breaking_photo }}">
-            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
-              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
-              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskBot);mask-image:var(--patMaskBot);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
               <sc-if value="{{ showPhoto }}"><image-slot id="bp_photo" style="width:100%;height:calc(258px * var(--imgScale));" shape="rect" placeholder="اسحب صورة الخبر"></image-slot></sc-if>
-              <div style="position:absolute;top:238px;right:22px;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:64px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div>
+              <sc-if value="{{ showBadge }}"><div style="position:absolute;top:238px;right:22px;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:64px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div></sc-if>
               <p style="position:relative;padding:30px var(--txtPad) 0;font-family:var(--fontBody),sans-serif;color:var(--cream);font-size:calc(19px*var(--headScale));line-height:1.95;margin:0;text-align:var(--txtAlign);text-justify:inter-word;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
               <sc-if value="{{ showFreq }}"><div data-mv="fm" style="position:absolute;transform:translate(var(--fmX),var(--fmY)) scale(var(--fmS));cursor:move;left:24px;bottom:20px;width:58px;height:36px;background:var(--fmCur) center/contain no-repeat;"></div></sc-if>
               <sc-if value="{{ showLogo }}"><div style="position:absolute;right:24px;bottom:18px;width:55px;height:36px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
@@ -346,11 +477,11 @@
           </sc-if>
 
           <sc-if value="{{ d.breaking_text }}">
-            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:26px;">
-              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
-              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
-              <div style="position:relative;width:fit-content;margin:0 auto 18px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:56px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div>
-              <div style="position:relative;background:var(--cream);border-radius:16px;padding:24px var(--txtPad);min-height:285px;overflow:hidden;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">
+            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:26px;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskBot);mask-image:var(--patMaskBot);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
+              <sc-if value="{{ showBadge }}"><div style="position:relative;width:fit-content;margin:0 auto 18px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:56px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div></sc-if>
+              <div style="position:relative;width:var(--boxWidth);margin-left:auto;margin-right:auto;background:var(--cream);border-radius:16px;padding:24px var(--txtPad);min-height:285px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">
                 <div style="position:absolute;inset:0;background-image:var(--patURLalt);background-repeat:no-repeat;background-position:center;background-size:var(--pboxSize);opacity:var(--pboxOp);pointer-events:none;"></div>
                 <p style="position:relative;font-family:var(--fontBody),sans-serif;color:var(--dark);font-size:calc(18px*var(--headScale));line-height:1.95;margin:0;text-align:var(--txtAlign);text-justify:inter-word;">{{ headline }}</p>
               </div>
@@ -359,10 +490,47 @@
             </div>
           </sc-if>
 
+          <sc-if value="{{ d.news_photo }}">
+            <div data-export-node="1" data-w="1080" data-h="1350" style="width:384px;height:480px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);z-index:5;"></div></sc-if>
+              <sc-if value="{{ showPhoto }}"><div data-mv="img" style="position:absolute;top:0;left:-9%;right:-9%;height:70%;transform:translate(var(--imgX), var(--imgY)) scale(var(--imgScale));transform-origin:center;cursor:move;"><image-slot id="np_photo" fit="cover" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب صورة الخبر"></image-slot></div></sc-if>
+              <div style="position:absolute;top:0;left:0;right:0;height:62%;background:linear-gradient(180deg, rgba(27,35,38,0) 50%, rgba(27,35,38,.92) 100%);pointer-events:none;z-index:1;"></div>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:40%;background:var(--rootBg);z-index:0;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:34%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskBot);mask-image:var(--patMaskBot);background-repeat:no-repeat;background-position:left bottom;background-size:150%;opacity:var(--pbotOp);pointer-events:none;z-index:1;"></div>
+              <div style="position:absolute;top:calc(62% - 17px);right:26px;z-index:4;display:flex;align-items:center;gap:10px;">
+                <span style="background:var(--gold);color:var(--dark);font-family:var(--fontHead),sans-serif;font-weight:700;font-size:14px;padding:6px 18px;border-radius:5px;letter-spacing:.5px;direction:ltr;box-shadow:0 5px 14px rgba(0,0,0,.4);">{{ dateFull }}</span>
+                <span style="width:50px;height:3px;background:var(--gold);border-radius:2px;"></span>
+              </div>
+              <p style="position:absolute;top:65.5%;right:26px;left:26px;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:calc(24px*var(--headScale));line-height:1.5;margin:0;z-index:3;transform:translate(var(--boxX),var(--boxY)) scale(var(--boxS));transform-origin:top right;cursor:move;text-align:var(--txtAlign);" data-mv="box">{{ headline }}</p>
+              <div style="position:absolute;left:26px;right:26px;bottom:20px;display:flex;align-items:center;justify-content:space-between;z-index:4;">
+                <sc-if value="{{ showFreq }}"><div data-mv="fm" style="transform:translate(var(--fmX),var(--fmY)) scale(var(--fmS));cursor:move;width:56px;height:34px;background:var(--fmCur) center/contain no-repeat;"></div></sc-if>
+                <sc-if value="{{ showLogo }}"><div data-mv="logo" style="transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;width:56px;height:36px;background:var(--logoCur) center/contain no-repeat;"></div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ d.news_text }}">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);display:flex;flex-direction:column;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:48%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center top;background-size:135%;opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:42%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskBot);mask-image:var(--patMaskBot);background-repeat:no-repeat;background-position:center bottom;background-size:135%;opacity:var(--pbotOp);pointer-events:none;"></div>
+              <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);z-index:3;"></div></sc-if>
+              <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:42px var(--txtPad);z-index:2;transform:translate(var(--boxX),var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">
+                <span style="background:var(--gold);color:var(--dark);font-family:var(--fontHead),sans-serif;font-weight:700;font-size:15px;padding:6px 22px;border-radius:5px;letter-spacing:1px;direction:ltr;">{{ dateFull }}</span>
+                <span style="width:44px;height:3px;background:var(--gold);border-radius:2px;margin:18px 0;opacity:.85;"></span>
+                <p style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:calc(29px*var(--headScale));line-height:1.55;margin:0;text-align:center;">{{ headline }}</p>
+                <span style="width:44px;height:3px;background:var(--gold);border-radius:2px;margin:18px 0 0;opacity:.85;"></span>
+              </div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:center;gap:13px;padding-bottom:22px;z-index:2;">
+                <sc-if value="{{ showLogo }}"><div data-mv="logo" style="transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;width:52px;height:34px;background:var(--logoCur) center/contain no-repeat;"></div></sc-if>
+                <sc-if value="{{ showFreq }}"><span style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:13px;opacity:.85;">{{ fmLine }}</span></sc-if>
+              </div>
+            </div>
+          </sc-if>
+
           <sc-if value="{{ d.text_photo }}">
-            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
-              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
-              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1440" style="width:380px;height:507px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:var(--pbotY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskBot);mask-image:var(--patMaskBot);background-repeat:no-repeat;background-position:center center;background-size:var(--pbotSize);opacity:var(--pbotOp);pointer-events:none;"></div>
               <sc-if value="{{ showPhoto }}"><image-slot id="tp_photo" style="position:relative;display:block;width:calc(100% - 96px);height:calc(250px * var(--imgScale));margin:0 48px 0;border-bottom:3px solid var(--gold);" shape="rect" placeholder="اسحب الصورة"></image-slot></sc-if>
               <p style="position:relative;font-family:var(--fontBody),sans-serif;color:var(--cream);font-size:calc(18px*var(--headScale));line-height:1.95;margin:24px 0 0;padding:0 48px;text-align:var(--txtAlign);text-justify:inter-word;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
               <sc-if value="{{ showFreq }}"><div data-mv="fm" style="position:absolute;transform:translate(var(--fmX),var(--fmY)) scale(var(--fmS));cursor:move;left:48px;bottom:20px;width:55px;height:34px;background:var(--fmCur) center/contain no-repeat;"></div></sc-if>
@@ -383,23 +551,24 @@
           </sc-if>
 
           <sc-if value="{{ d.square }}">
-            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
               <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);z-index:2;"></div></sc-if>
               <sc-if value="{{ showPhoto }}"><image-slot id="sq_photo" style="width:100%;height:calc(226px * var(--imgScale));" shape="rect" placeholder="اسحب الصورة"></image-slot></sc-if>
               <div style="padding:26px 28px;position:relative;">
                 <div style="display:inline-block;background:var(--brick);color:var(--cream);font-family:var(--fontHead),sans-serif;font-weight:600;font-size:14px;padding:5px 15px;border-radius:5px;">منوّعات</div>
-                <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:31px;margin-top:14px;line-height:1.2;">{{ headline }}</div>
+                <div style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:calc(31px * var(--headScale));margin-top:14px;line-height:1.3;text-align:var(--txtAlign);transform:translate(var(--boxX),var(--boxY)) scale(var(--boxS));transform-origin:top right;cursor:move;" data-mv="box">{{ headline }}</div>
                 <sc-if value="{{ showLogo }}"><div style="width:52px;height:34px;margin-top:18px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
               </div>
             </div>
           </sc-if>
 
           <sc-if value="{{ d.story }}">
-            <div data-export-node="1" data-w="1080" data-h="1920" style="width:250px;height:444px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
-              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1920" style="width:250px;height:444px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);">
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMaskFull);mask-image:var(--patMaskFull);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <sc-if value="{{ showPhoto }}"><image-slot id="st_photo" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب خلفية (اختياري)"></image-slot></sc-if>
+              <sc-if value="{{ textScrim }}"><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,calc(0.12 * var(--scrimMul))) 0%,rgba(0,0,0,calc(0.32 * var(--scrimMul))) 45%,rgba(0,0,0,calc(0.62 * var(--scrimMul))) 100%);pointer-events:none;"></div></sc-if>
               <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 26px;pointer-events:none;">
-                <div style="position:relative;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:52px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div>
+                <sc-if value="{{ showBadge }}"><div style="position:relative;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));transform:translate(var(--badgeX), var(--badgeY)) scale(var(--badgeS));cursor:move;" data-mv="badge"><img src="assets/badge-aajel-plain.png" style="height:52px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div></sc-if>
                 <div style="font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--cream);font-size:calc(19px*var(--headScale));margin-top:20px;line-height:1.5;text-shadow:0 2px 6px rgba(0,0,0,.4);transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;text-align:var(--txtAlign);" data-mv="box">{{ headline }}</div>
               </div>
               <sc-if value="{{ showLogo }}"><div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:46px;height:30px;background:var(--logoCur) center/contain no-repeat;transform:translate(var(--logoX),var(--logoY)) scale(var(--logoS));cursor:move;" data-mv="logo"></div></sc-if>
@@ -443,8 +612,8 @@
           </sc-if>
 
           <sc-if value="{{ d.now_air }}">
-            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 36px;">
-              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 36px;">
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMaskFull);mask-image:var(--patMaskFull);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
               <div style="position:relative;display:flex;align-items:center;gap:9px;background:var(--dark);border-radius:6px;padding:9px 19px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);animation:livepulse 1.4s infinite;"></span><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:16px;">الآن على الهواء</span></div>
               <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:38px;margin-top:24px;line-height:1.1;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ program }}</div>
@@ -454,8 +623,8 @@
           </sc-if>
 
           <sc-if value="{{ d.quote_deco }}">
-            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:46px 40px;display:flex;flex-direction:column;justify-content:center;">
-              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:60%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:46px 40px;display:flex;flex-direction:column;justify-content:center;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:60%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <div style="position:absolute;inset:18px;border:2px solid var(--gold);border-radius:14px;pointer-events:none;opacity:.55;"></div>
               <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;font-size:110px;color:var(--gold);line-height:.45;height:52px;text-align:center;">”</div>
               <p style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;font-size:30px;line-height:1.65;color:var(--cream);margin:20px 0;text-align:center;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ headline }}</p>
@@ -471,7 +640,7 @@
           <sc-if value="{{ d.carousel }}">
             <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
               <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:{{ carBg }};position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:44px 40px;display:flex;flex-direction:column;justify-content:center;">
-                <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+                <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:58%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
                 <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
                 <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--gold);font-size:15px;">{{ carNum }}</div>
                 <div style="position:relative;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:34px;line-height:1.25;margin-top:14px;transform:translate(var(--boxX), var(--boxY)) scale(var(--boxS));cursor:move;" data-mv="box">{{ carHead }}</div>
@@ -495,7 +664,7 @@
 
           <sc-if value="{{ d.weather }}">
             <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:linear-gradient(160deg,var(--dark) 0%,var(--brick) 130%);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:38px 36px;display:flex;flex-direction:column;">
-              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:55%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:55%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
               <div style="position:relative;display:flex;align-items:center;justify-content:space-between;">
                 <div>
@@ -519,8 +688,8 @@
           </sc-if>
 
           <sc-if value="{{ d.match }}">
-            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--darkBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:34px 30px;display:flex;flex-direction:column;">
-              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:50%;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:34px 30px;display:flex;flex-direction:column;">
+              <div style="position:absolute;top:var(--ptopY);left:0;right:0;height:50%;background-image:var(--patURL);-webkit-mask-image:var(--patMaskTop);mask-image:var(--patMaskTop);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
               <div style="position:relative;text-align:center;font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--gold);font-size:16px;">{{ mLeague }}</div>
               <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;">
@@ -533,8 +702,8 @@
           </sc-if>
 
           <sc-if value="{{ d.audiogram }}">
-            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--brickBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:34px 32px;display:flex;flex-direction:column;">
-              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+            <div data-export-node="1" data-w="1080" data-h="1080" style="width:430px;height:430px;border-radius:var(--radius);overflow:hidden;background:var(--rootBg);position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:34px 32px;display:flex;flex-direction:column;">
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMaskFull);mask-image:var(--patMaskFull);background-repeat:no-repeat;background-position:center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <div style="position:relative;display:flex;align-items:center;gap:9px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);animation:livepulse 1.4s infinite;"></span><span style="font-family:var(--fontHead),sans-serif;font-weight:700;color:var(--cream);font-size:15px;">{{ agLabel }}</span></div>
               <div style="position:relative;display:flex;align-items:center;gap:16px;margin-top:22px;">
                 <sc-if value="{{ showPhoto }}"><image-slot id="ag_photo" style="width:calc(96px * var(--imgScale));height:calc(96px * var(--imgScale));flex:none;" shape="circle" placeholder="صورة الضيف"></image-slot></sc-if>
@@ -552,7 +721,7 @@
             <div data-export-node="1" data-w="{{ cfg.w }}" data-h="{{ cfg.h }}" style="width:{{ cfg.dispW }}px;height:{{ cfg.dispH }}px;border-radius:var(--radius);overflow:hidden;position:relative;box-shadow:0 6px 26px rgba(0,0,0,.28);background:{{ cfg.bgColor }};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;">
               <sc-if value="{{ cfg.showImg }}"><div data-cimgframe="1" style="position:absolute;left:50%;top:50%;width:var(--cimgW);height:var(--cimgH);z-index:{{ cfg.zImage }};transform:translate(calc(-50% + var(--cimgPX)), calc(-50% + var(--cimgPY)));transform-origin:center;"><image-slot id="custom_photo" fit="{{ cfg.imgFit }}" style="position:absolute;inset:0;width:100%;height:100%;" shape="rect" placeholder="اسحب الصورة"></image-slot><span data-cimgresize="1" data-ccorner="nw" style="position:absolute;left:-8px;top:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;z-index:40;"></span><span data-cimgresize="1" data-ccorner="ne" style="position:absolute;right:-8px;top:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;z-index:40;"></span><span data-cimgresize="1" data-ccorner="sw" style="position:absolute;left:-8px;bottom:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;z-index:40;"></span><span data-cimgresize="1" data-ccorner="se" style="position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;z-index:40;"></span></div></sc-if>
               <sc-if value="{{ cfg.showImg }}"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.45),transparent 55%);pointer-events:none;z-index:{{ cfg.zImage }};"></div></sc-if>
-              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMask);mask-image:var(--patMask);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
+              <div style="position:absolute;inset:0;background-image:var(--patURL);-webkit-mask-image:var(--patMaskFull);mask-image:var(--patMaskFull);background-repeat:no-repeat;background-position:center center;background-size:var(--ptopSize);opacity:var(--ptopOp);pointer-events:none;"></div>
               <sc-if value="{{ bar }}"><div style="position:absolute;top:0;right:0;left:0;height:var(--barH);background:var(--gold);"></div></sc-if>
               <sc-if value="{{ cfg.showBadge }}"><div style="position:relative;display:inline-block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));margin-bottom:18px;z-index:{{ cfg.zBadge }};"><img src="assets/badge-aajel-plain.png" style="height:58px;display:block;"><div style="position:absolute;top:var(--dateTop);left:var(--dateLeft);width:var(--dateW);text-align:center;font-family:var(--fontHead),sans-serif;font-weight:600;color:var(--gold);direction:ltr;line-height:1.05;font-size:var(--dateFs);">{{ dateDM }}<br>{{ dateY }}</div></div></sc-if>
               <sc-for list="{{ cfg.pngsR }}" as="pg" hint-placeholder-count="0"><div data-pidx="{{ pg.i }}" style="position:absolute;left:50%;top:42%;margin-left:{{ pg.x }}px;margin-top:{{ pg.y }}px;width:{{ pg.w }}px;transform:translate(-50%,-50%);z-index:{{ pg.z }};outline:{{ pg.outline }};outline-offset:3px;cursor:move;"><div style="{{ pg.imgStyle }}"></div><sc-if value="{{ pg.selected }}"><span data-presize="{{ pg.i }}" style="position:absolute;left:-7px;top:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;"></span><span data-presize="{{ pg.i }}" style="position:absolute;right:-7px;top:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;"></span><span data-presize="{{ pg.i }}" style="position:absolute;left:-7px;bottom:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nesw-resize;"></span><span data-presize="{{ pg.i }}" style="position:absolute;right:-7px;bottom:-7px;width:13px;height:13px;background:#f2d47e;border:2px solid #1b2326;border-radius:50%;cursor:nwse-resize;"></span></sc-if></div></sc-for>
@@ -577,21 +746,20 @@
         </div>
         <div class="grp">
           <h4>الشعار (يُطبّق على كل التصاميم)</h4>
-          <span class="lab">اللوغو الأبيض — للخلفيات الطوبية والملوّنة</span>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--brick);border-radius:8px;padding:10px;"><div style="width:52px;height:34px;background:var(--logoWhite) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoWhite }}" style="color:#cfd6d8;font-size:12px;"></div>
-          <span class="lab">اللوغو الطوبي — للخلفيات الداكنة</span>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--dark);border-radius:8px;padding:10px;"><div style="width:52px;height:34px;background:var(--logoLight) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoLight }}" style="color:#cfd6d8;font-size:12px;"></div>
-          <span class="lab">اللوغو الأساسي (غامق) — للخلفيات الفاتحة</span>
-          <div style="display:flex;align-items:center;gap:12px;"><div style="background:var(--cream);border-radius:8px;padding:10px;"><div style="width:52px;height:34px;background:var(--logoDark) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoDark }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <div style="font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:#8a9295;line-height:1.7;margin-bottom:11px;">ارفع لوغو راديو البلد بنسختين (يُفضّل دقة عالية، عرض ≥ 1500 بكسل). يُختار النوع المناسب تلقائياً حسب لون خلفية كل تصميم.</div>
+          <span class="lab">① للخلفية الطوبية — اللوغو باللون الذهبي/الفاتح</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;"><div style="background:var(--brick);border-radius:8px;padding:10px;"><div style="width:54px;height:35px;background:var(--logoWhite) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoBrickVer }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <span class="lab">② للخلفية الداكنة — اللوغو باللون الطوبي</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;"><div style="background:var(--dark);border-radius:8px;padding:10px;"><div style="width:54px;height:35px;background:var(--logoLight) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onLogoDarkVer }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <button onClick="{{ resetLogos }}" class="btn" style="width:100%;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">↺ إزالة اللوغو واستعادة الافتراضي</button>
         </div>
         <div class="grp">
-          <h4>لوغو التردد (FM) — يُطبّق على الكل</h4>
-          <span class="lab">الأبيض — للخلفيات الطوبية والملوّنة</span>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--brick);border-radius:8px;padding:10px;"><div style="width:46px;height:30px;background:var(--fmWhite) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmWhite }}" style="color:#cfd6d8;font-size:12px;"></div>
-          <span class="lab">الطوبي — للخلفيات الداكنة</span>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="background:var(--dark);border-radius:8px;padding:10px;"><div style="width:46px;height:30px;background:var(--fmBrick) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmBrick }}" style="color:#cfd6d8;font-size:12px;"></div>
-          <span class="lab">الأساسي (غامق) — للخلفيات الفاتحة</span>
-          <div style="display:flex;align-items:center;gap:12px;"><div style="background:var(--cream);border-radius:8px;padding:10px;"><div style="width:46px;height:30px;background:var(--fmDark) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmDark }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <h4>لوغو التردد (FM)</h4>
+          <span class="lab">① للخلفية الطوبية — باللون الذهبي/الفاتح</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;"><div style="background:var(--brick);border-radius:8px;padding:10px;"><div style="width:48px;height:31px;background:var(--fmWhite) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmBrickVer }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <span class="lab">② للخلفية الداكنة — باللون الطوبي</span>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px;"><div style="background:var(--dark);border-radius:8px;padding:10px;"><div style="width:48px;height:31px;background:var(--fmBrick) center/contain no-repeat;"></div></div><input type="file" accept="image/*" onChange="{{ onFmDarkVer }}" style="color:#cfd6d8;font-size:12px;"></div>
+          <button onClick="{{ resetFm }}" class="btn" style="width:100%;background:#3a2420;color:#f2d47e;border:1px solid #5a382f;">↺ إزالة لوغو التردد</button>
         </div>
         <div class="grp">
           <h4>عمق بصري (تدرّج)</h4>
@@ -747,9 +915,9 @@ class Component extends DCLogic {
     this.rootRef = React.createRef();
     this.stageRef = React.createRef();
     this.defaults = { dark:"#1b2326", brick:"#c1624c", deep:"#b94126", cream:"#fdf6e3", gold:"#f2d47e" };
-    this.DEFAULTS_DS = { ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, radius:0, bar:true, bold:false, headScale:1, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, cimgW:100, cimgH:100, cimgPX:0, cimgPY:0, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, showLogo:true, showFreq:true, showPhoto:true, headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.", ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.", guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب", program:"اسم البرنامج", host:"مع المذيع" };
+    this.DEFAULTS_DS = { ptopOp:0.9, ptopSize:130, ptopY:0, pbotOp:0.9, pbotSize:130, pbotY:0, pboxOp:0.5, pboxSize:85, radius:0, bar:true, bold:false, headScale:1, autoFit:true, bgMode:null, logoTone:"auto", showBadge:true, textScrim:false, scrimAmt:0.6, boxW:100, wordSp:0, lineH:1.65, txtAlign:"justify", txtPad:28, imgScale:1, cimgS:1, cimgW:100, cimgH:100, cimgPX:0, cimgPY:0, patFadeAmt:0, patFadeDir:"bottom", imgX:0, imgY:0, boxX:0, boxY:0, badgeX:0, badgeY:0, logoX:0, logoY:0, fmX:0, fmY:0, boxS:1, badgeS:1, logoS:1, fmS:1, showLogo:true, showFreq:true, showPhoto:true, headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.", ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.", guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب", program:"اسم البرنامج", host:"مع المذيع" };
     this.state = {
-      screen:"home", selected:null, settingsOpen:false, builderOpen:false, generatorOpen:false, ds:{}, templates:[], selPng:null, thumbs:{},
+      screen:"home", selected:null, settingsOpen:false, builderOpen:false, generatorOpen:false, ds:{}, templates:[], selPng:null, thumbs:{}, recent:[], tourSeen:false, tourOpen:false, quickHeadline:"", quickImage:"", pendingImage:"", pendingImageFor:[],
       genHeadline:"", genImage:"",
       customCfg:{ size:"1080x1080", bg:"dark", showImg:true, showBadge:false, showText:true, showLogo:true, pngs:[], imgFit:"cover", customW:1200, customH:800 },
       t:{...this.defaults}, radius:0, bar:true, font:"plex",
@@ -758,14 +926,14 @@ class Component extends DCLogic {
       station:"صوت البلد · من قلب حلب", fmLine:"FM 102.6 · من قلب حلب",
       gradBg:false, gradPat:false,
       autoDate:true, manualDate:"",
-      logoLight:null, logoDark:null, logoWhite:null,
-      fmWhite:null, fmBrick:null, fmDark:null,
+      logoLight:null, logoDark:null, logoWhite:null, logoMain:null,
+      fmWhite:null, fmBrick:null, fmDark:null, fmMain:null,
       headline:"عنوان الخبر العاجل يُكتب هنا ضمن مساحة مريحة للقراءة.",
       ticker:"شريط الأخبار المتحرك يعرض العناوين المتتالية على مدار البث المباشر لراديو البلد.",
       guest:"اسم الضيف", guestTitle:"صفة الضيف / المنصب",
       program:"اسم البرنامج", host:"مع المذيع", agLabel:"بودكاست راديو البلد",
       clock:"20:00",
-      tickerLabel:"عاجل", showRerun:false, exportTransparent:false, exportScale:3,
+      tickerLabel:"عاجل", showRerun:false, exportTransparent:false, exportScale:4,
       wCity:"حلب", wTemp:"24", wCond:"مشمس جزئياً", wHi:"27", wLo:"15", wIcon:"☀",
       mLeague:"الدوري الممتاز", mTeamA:"الاتحاد", mTeamB:"الوحدة", mScoreA:"2", mScoreB:"1", mStatus:"انتهت المباراة",
       schedule:[
@@ -785,21 +953,22 @@ class Component extends DCLogic {
   }
   componentDidMount(){
     let restored=false;
-    try{ const s=JSON.parse(localStorage.getItem("albalad-studio")||"null"); if(s){ restored=true; this.setState(s,()=>{ this.migratePngs(); this.applyVars(); }); } }catch(e){}
+    try{ const s=JSON.parse(localStorage.getItem("albalad-studio")||"null"); if(s){ restored=true; this.setState(s,()=>{ this.migratePngs(); this.applyVars(); this.compactStorage(); }); } }catch(e){}
     if(!restored){ try{ fetch("seed.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(o=>{ if(o&&typeof o==="object"){ this.setState(o,()=>{ this.migratePngs(); this.applyVars(); this.persist(); }); } }).catch(()=>{}); }catch(e){} }
     this.applyVars();
     const tick=()=>{ const d=new Date(); this.setState({clock:String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}); };
     tick(); this._t=setInterval(tick,20000);
-    this._onDown=(e)=>{ if(this.state.screen!=="edit")return; const cr=e.target.closest&&e.target.closest("[data-cimgresize]"); if(cr){ e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); const rect=node?node.getBoundingClientRect():{width:1,height:1}; this._cimgrz={corner:cr.getAttribute("data-ccorner")||"se",sx:e.clientX,sy:e.clientY,sw:this.state.cimgW||100,sh:this.state.cimgH||100,rw:rect.width||1,rh:rect.height||1,nw:null,nh:null}; return; } const rs=e.target.closest&&e.target.closest("[data-presize]"); if(rs){ e.preventDefault(); const i=+rs.getAttribute("data-presize"); const cont=rs.parentElement; const r=cont.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; const p=this.state.customCfg.pngs[i]; const s0=p?(p.s||1):1; const d0=Math.hypot(e.clientX-cx,e.clientY-cy)||1; this._presize={i,cont,cx,cy,s0,d0,ns:null}; return; } const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ const i=+pe.getAttribute("data-pidx"); const p=this.state.customCfg.pngs[i]; if(p){ e.preventDefault(); if(this.state.selPng!==i) this.setState({selPng:i}); this._pdrag={i,sx:e.clientX,sy:e.clientY,ox:p.x,oy:p.y,el:pe,nx:null}; } return; } const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; const k=el.getAttribute("data-mv"); e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); this._drag={k,el,node,sx:e.clientX,sy:e.clientY,ox:this.state[k+"X"]||0,oy:this.state[k+"Y"]||0,nx:null}; };
+    this._onDown=(e)=>{ if(this.state.screen!=="edit")return; const cr=e.target.closest&&e.target.closest("[data-cimgresize]"); if(cr){ e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); const rect=node?node.getBoundingClientRect():{width:1,height:1}; this._cimgrz={corner:cr.getAttribute("data-ccorner")||"se",sx:e.clientX,sy:e.clientY,sw:this.state.cimgW||100,sh:this.state.cimgH||100,rw:rect.width||1,rh:rect.height||1,nw:null,nh:null}; return; } const rs=e.target.closest&&e.target.closest("[data-presize]"); if(rs){ e.preventDefault(); const i=+rs.getAttribute("data-presize"); const cont=rs.parentElement; const r=cont.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; const p=this.state.customCfg.pngs[i]; const s0=p?(p.s||1):1; const d0=Math.hypot(e.clientX-cx,e.clientY-cy)||1; this._presize={i,cont,cx,cy,s0,d0,ns:null}; return; } const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ const i=+pe.getAttribute("data-pidx"); const p=this.state.customCfg.pngs[i]; if(p){ e.preventDefault(); if(this.state.selPng!==i) this.setState({selPng:i}); this._pdrag={i,sx:e.clientX,sy:e.clientY,ox:p.x,oy:p.y,el:pe,nx:null}; } return; } const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; const k=el.getAttribute("data-mv"); if(k==="img"){ const slot=el.querySelector&&el.querySelector("image-slot"); if(!slot||!slot.hasAttribute("data-filled")) return; } else if(!this.state.adv){ return; } e.preventDefault(); const node=this.rootRef.current&&this.rootRef.current.querySelector("[data-export-node]"); this._drag={k,el,node,sx:e.clientX,sy:e.clientY,ox:this.state[k+"X"]||0,oy:this.state[k+"Y"]||0,nx:null}; };
     this._onMove=(e)=>{ if(this._cimgrz){ const z=this._cimgrz; const dxF=(e.clientX-z.sx)/z.rw*100, dyF=(e.clientY-z.sy)/z.rh*100; const sX=z.corner.indexOf("e")>=0?1:-1, sY=z.corner.indexOf("s")>=0?1:-1; let nw=Math.max(10,Math.min(220,z.sw+sX*dxF*2)); let nh=Math.max(10,Math.min(220,z.sh+sY*dyF*2)); z.nw=nw; z.nh=nh; const rt=this.rootRef.current; if(rt){ rt.style.setProperty("--cimgW",nw+"%"); rt.style.setProperty("--cimgH",nh+"%"); } return; } if(this._presize){ const pr=this._presize; const d=Math.hypot(e.clientX-pr.cx,e.clientY-pr.cy); let ns=pr.s0*(d/pr.d0); ns=Math.max(0.2,Math.min(4,ns)); pr.ns=ns; pr.cont.style.width=(ns*120)+"px"; return; } if(this._pdrag){ const nx=this._pdrag.ox+(e.clientX-this._pdrag.sx), ny=this._pdrag.oy+(e.clientY-this._pdrag.sy); this._pdrag.el.style.marginLeft=nx+"px"; this._pdrag.el.style.marginTop=ny+"px"; this._pdrag.nx=nx; this._pdrag.ny=ny; return; } if(!this._drag)return; let nx=this._drag.ox+(e.clientX-this._drag.sx), ny=this._drag.oy+(e.clientY-this._drag.sy); const rt=this.rootRef.current; const TH=7; let snapV=false,snapH=false; const dr=this._drag; if(dr.node&&dr.el){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); const nr=dr.node.getBoundingClientRect(), er=dr.el.getBoundingClientRect(); const dx=(nr.left+nr.width/2)-(er.left+er.width/2); const dy=(nr.top+nr.height/2)-(er.top+er.height/2); if(Math.abs(dx)<TH){ nx+=dx; snapV=true; } if(Math.abs(dy)<TH){ ny+=dy; snapH=true; } } if(rt){ rt.style.setProperty("--"+dr.k+"X",nx+"px"); rt.style.setProperty("--"+dr.k+"Y",ny+"px"); } this.showGuides(dr.node,snapV,snapH); this._drag.nx=nx; this._drag.ny=ny; };
     this._onUp=()=>{ if(this._cimgrz){ const z=this._cimgrz; this._cimgrz=null; if(z.nw!=null) this.up({cimgW:Math.round(z.nw),cimgH:Math.round(z.nh)}); return; } if(this._presize){ const pr=this._presize; this._presize=null; if(pr.ns!=null) this.setPngScale(pr.i,pr.ns); return; } if(this._pdrag){ const pd=this._pdrag; this._pdrag=null; if(pd.nx!=null){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); pngs[pd.i]={...pngs[pd.i],x:Math.round(pd.nx),y:Math.round(pd.ny)}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); } return; } if(!this._drag)return; const k=this._drag.k,nx=this._drag.nx,ny=this._drag.ny; this._drag=null; this.hideGuides(); if(nx!=null) this.up({[k+"X"]:Math.round(nx),[k+"Y"]:Math.round(ny)}); };
     document.addEventListener("pointerdown",this._onDown); document.addEventListener("pointermove",this._onMove); document.addEventListener("pointerup",this._onUp);
     this._onWheel=(e)=>{ const pe=e.target.closest&&e.target.closest("[data-pidx]"); if(pe){ e.preventDefault(); const i=+pe.getAttribute("data-pidx"); this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); const cur=pngs[i]; if(!cur)return null; let ns=(cur.s||1)-e.deltaY*0.0015; ns=Math.max(0.2,Math.min(4,ns)); pngs[i]={...cur,s:ns}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); return; } if(this.state.screen!=="edit")return; const el=e.target.closest&&e.target.closest("[data-mv]"); if(!el)return; e.preventDefault(); const k=el.getAttribute("data-mv"); let s=(this.state[k+"S"]||1)-e.deltaY*0.0015; s=Math.max(0.3,Math.min(3,s)); const rt=this.rootRef.current; if(rt) rt.style.setProperty("--"+k+"S",s); clearTimeout(this._wt); this._wt=setTimeout(()=>this.up({[k+"S"]:Math.round(s*100)/100}),260); };
     document.addEventListener("wheel",this._onWheel,{passive:false});
-    this._onResize=()=>this.fitStage(); window.addEventListener("resize",this._onResize);
+    this._onResize=()=>{ this.fitStage(); this.justifyKashida(); }; window.addEventListener("resize",this._onResize);
     this.fitStage();
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>this.justifyKashida());
   }
-  componentDidUpdate(){ this.fitStage(); }
+  componentDidUpdate(){ this.fitStage(); if(this._kraf2) cancelAnimationFrame(this._kraf2); this._kraf2=requestAnimationFrame(()=>this.justifyKashida()); }
   fitStage(){ const st=this.stageRef&&this.stageRef.current; if(!st)return; const prev=st.parentElement; const node=st.querySelector("[data-export-node]"); if(!prev||!node){ st.style.transform=""; return; } const availW=prev.clientWidth-24, availH=prev.clientHeight-24; const nw=node.offsetWidth||1, nh=node.offsetHeight||1; let sc=Math.min(availW/nw, availH/nh, 1); if(!isFinite(sc)||sc<=0) sc=1; st.style.transform="scale("+sc+")"; }
   componentWillUnmount(){ clearInterval(this._t); document.removeEventListener("pointerdown",this._onDown); document.removeEventListener("pointermove",this._onMove); document.removeEventListener("pointerup",this._onUp); document.removeEventListener("wheel",this._onWheel); window.removeEventListener("resize",this._onResize); }
   showGuides(node,v,h){
@@ -827,56 +996,166 @@ class Component extends DCLogic {
     r.style.setProperty("--ptopOp",this.state.ptopOp); r.style.setProperty("--ptopSize",this.state.ptopSize+"%"); r.style.setProperty("--ptopY",this.state.ptopY+"px");
     r.style.setProperty("--pbotOp",this.state.pbotOp); r.style.setProperty("--pbotSize",this.state.pbotSize+"%"); r.style.setProperty("--pbotY",this.state.pbotY+"px");
     r.style.setProperty("--pboxOp",this.state.pboxOp); r.style.setProperty("--pboxSize",this.state.pboxSize+"%"); r.style.setProperty("--bodyW",this.state.bold?"600":"400");
-    r.style.setProperty("--headScale",this.state.headScale); r.style.setProperty("--txtAlign",this.state.txtAlign); r.style.setProperty("--txtPad",this.state.txtPad+"px");
+    r.style.setProperty("--headScale",this.fitScale()); r.style.setProperty("--txtAlign",this.state.txtAlign); r.style.setProperty("--txtPad",this.state.txtPad+"px");
     r.style.setProperty("--imgY",this.state.imgY+"px"); r.style.setProperty("--boxY",this.state.boxY+"px"); r.style.setProperty("--badgeY",this.state.badgeY+"px");
     r.style.setProperty("--imgScale",this.state.imgScale);
+    r.style.setProperty("--scrimMul", this.state.scrimAmt==null?0.6:this.state.scrimAmt);
+    r.style.setProperty("--boxWidth", (this.state.boxW==null?100:this.state.boxW)+"%");
+    r.style.setProperty("--wordSp", (this.state.wordSp==null?0:this.state.wordSp)+"px");
+    r.style.setProperty("--lineH", this.state.lineH==null?1.65:this.state.lineH);
     const gOv="linear-gradient(155deg, rgba(255,255,255,.10) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,.30) 100%)";
     r.style.setProperty("--darkBg", this.state.gradBg?(gOv+", var(--dark)"):"var(--dark)");
     r.style.setProperty("--brickBg", this.state.gradBg?(gOv+", var(--brick)"):"var(--brick)");
     const fa=Math.max(0,Math.min(1,this.state.patFadeAmt||0)); const fEnd=(1-fa).toFixed(3);
-    const pm=fa<=0?"none":(this.state.patFadeDir==="top"?("linear-gradient(to bottom, rgba(0,0,0,"+fEnd+") 0%, #000 100%)"):("linear-gradient(to bottom, #000 0%, rgba(0,0,0,"+fEnd+") 100%)"));
-    r.style.setProperty("--patMask", pm);
+    if(fa<=0){ r.style.setProperty("--patMaskTop","none"); r.style.setProperty("--patMaskBot","none"); r.style.setProperty("--patMaskFull","none"); }
+    else{
+      r.style.setProperty("--patMaskTop","linear-gradient(to bottom, #000 0%, rgba(0,0,0,"+fEnd+") 100%)");
+      r.style.setProperty("--patMaskBot","linear-gradient(to top, #000 0%, rgba(0,0,0,"+fEnd+") 100%)");
+      r.style.setProperty("--patMaskFull","linear-gradient(to bottom, rgba(0,0,0,"+fEnd+") 0%, #000 38%, #000 62%, rgba(0,0,0,"+fEnd+") 100%)");
+    }
     r.style.setProperty("--cimgS",this.state.cimgS||1);
     r.style.setProperty("--cimgW",(this.state.cimgW||100)+"%"); r.style.setProperty("--cimgH",(this.state.cimgH||100)+"%");
     r.style.setProperty("--cimgPX",(this.state.cimgPX||0)+"px"); r.style.setProperty("--cimgPY",(this.state.cimgPY||0)+"px");
     r.style.setProperty("--imgX",this.state.imgX+"px"); r.style.setProperty("--boxX",this.state.boxX+"px"); r.style.setProperty("--badgeX",this.state.badgeX+"px");
     r.style.setProperty("--logoX",this.state.logoX+"px"); r.style.setProperty("--logoY",this.state.logoY+"px"); r.style.setProperty("--fmX",this.state.fmX+"px"); r.style.setProperty("--fmY",this.state.fmY+"px");
     r.style.setProperty("--boxS",this.state.boxS); r.style.setProperty("--badgeS",this.state.badgeS); r.style.setProperty("--logoS",this.state.logoS); r.style.setProperty("--fmS",this.state.fmS);
-    const lwhite=this.state.logoWhite||"assets/logo-white.png";
-    const lbrick=this.state.logoLight||"assets/logo-brick.png";
-    const ld=this.state.logoDark||"assets/logo-main.png";
-    r.style.setProperty("--logoWhite","url("+lwhite+")"); r.style.setProperty("--logoLight","url("+lbrick+")"); r.style.setProperty("--logoDark","url("+ld+")");
-    const onBrick="url("+lwhite+")";
-    const onDark="url("+lbrick+")";
-    let cur=onDark;
-    if(["now_air","story","breaking_text"].includes(this.state.selected)) cur=onBrick;
-    if(this.state.selected==="custom"){ const b=this.state.customCfg.bg; cur=(b==="brick"||b==="deep")?onBrick:(b==="cream"?("url("+ld+")"):onDark); }
+    const u=(s)=> s ? ("url(\""+s+"\")") : "none";
+    const lwhite=this.state.logoWhite||"";
+    const lbrick=this.state.logoLight||"";
+    const ld=this.state.logoLight||this.state.logoDark||"";
+    r.style.setProperty("--logoWhite",u(lwhite)); r.style.setProperty("--logoLight",u(lbrick)); r.style.setProperty("--logoDark",u(ld));
+    const onBrick=u(lwhite);
+    const onDark=u(lbrick);
+    const naturalBrick=["breaking_text","news_text","story","now_air","audiogram"];
+    const sel0=this.state.selected;
+    let effBg = this.state.bgMode || (naturalBrick.indexOf(sel0)>=0 ? "brick" : "dark");
+    const tone=this.state.logoTone||"auto";
+    let cur = (tone==="gold") ? onBrick : (tone==="brick" ? onDark : (effBg==="brick" ? onBrick : onDark));
+    if(sel0==="custom"){ const b=this.state.customCfg.bg; effBg=(b==="brick"||b==="deep")?"brick":(b==="cream"?"cream":"dark"); cur=(tone==="gold")?onBrick:(tone==="brick"?onDark:((b==="brick"||b==="deep")?onBrick:(b==="cream"?u(ld):onDark))); }
+    const baseCol = effBg==="brick" ? "var(--brick)" : "var(--dark)";
+    r.style.setProperty("--rootBg", this.state.gradBg?(gOv+", "+baseCol):baseCol);
     r.style.setProperty("--logoOnBrick",onBrick); r.style.setProperty("--logoOnDark",onDark); r.style.setProperty("--logoCur",cur);
-    const fmw=this.state.fmWhite||"assets/icon-fm.png", fmb=this.state.fmBrick||"assets/icon-fm.png", fmd=this.state.fmDark||"assets/icon-fm.png";
-    r.style.setProperty("--fmWhite","url("+fmw+")"); r.style.setProperty("--fmBrick","url("+fmb+")"); r.style.setProperty("--fmDark","url("+fmd+")");
-    const fmOnBrick="url("+fmw+")", fmOnDark="url("+fmb+")";
-    let fmCur=fmOnDark;
-    if(["now_air","story","breaking_text"].includes(this.state.selected)) fmCur=fmOnBrick;
-    if(this.state.selected==="custom"){ const b=this.state.customCfg.bg; fmCur=(b==="brick"||b==="deep")?fmOnBrick:(b==="cream"?("url("+fmd+")"):fmOnDark); }
+    const fmw=this.state.fmWhite||"", fmb=this.state.fmBrick||"", fmd=this.state.fmBrick||this.state.fmDark||"";
+    r.style.setProperty("--fmWhite",u(fmw)); r.style.setProperty("--fmBrick",u(fmb)); r.style.setProperty("--fmDark",u(fmd));
+    const fmOnBrick=u(fmw), fmOnDark=u(fmb);
+    let fmCur = (tone==="gold") ? fmOnBrick : (tone==="brick" ? fmOnDark : (effBg==="brick" ? fmOnBrick : fmOnDark));
+    if(sel0==="custom"){ const b=this.state.customCfg.bg; fmCur=(tone==="gold")?fmOnBrick:(tone==="brick"?fmOnDark:((b==="brick"||b==="deep")?fmOnBrick:(b==="cream"?u(fmd):fmOnDark))); }
     r.style.setProperty("--fmCur",fmCur);
     const cb=this.state.customCfg.bg; const clogo=(cb==="cream")?ld:((cb==="brick"||cb==="deep")?lwhite:lbrick);
-    r.style.setProperty("--customLogo","url("+clogo+")");
+    r.style.setProperty("--customLogo",u(clogo));
     const fonts={plex:["'IBM Plex Sans Arabic'","'IBM Plex Sans Arabic'"],cairo:["'Tajawal'","'Cairo'"],tajawal:["'Tajawal'","'Tajawal'"],reem:["'Reem Kufi'","'Cairo'"]};
     const [fh,fb]=fonts[this.state.font]||fonts.plex; r.style.setProperty("--fontHead",fh); r.style.setProperty("--fontBody",fb);
+    if(this._kraf) cancelAnimationFrame(this._kraf); this._kraf=requestAnimationFrame(()=>this.justifyKashida());
   }
   persist(){
-    const {t,font,patUrl,dateTop,dateLeft,dateFs,station,fmLine,gradBg,gradPat,autoDate,manualDate,logoLight,logoDark,logoWhite,fmWhite,fmBrick,fmDark,ds,templates,carSlides,wCity,wTemp,wCond,wHi,wLo,wIcon,mLeague,mTeamA,mTeamB,mScoreA,mScoreB,mStatus,schedule,customCfg,thumbs}=this.state;
-    try{ localStorage.setItem("albalad-studio",JSON.stringify({t,font,patUrl,dateTop,dateLeft,dateFs,station,fmLine,gradBg,gradPat,autoDate,manualDate,logoLight,logoDark,logoWhite,fmWhite,fmBrick,fmDark,ds,templates,carSlides,wCity,wTemp,wCond,wHi,wLo,wIcon,mLeague,mTeamA,mTeamB,mScoreA,mScoreB,mStatus,schedule,customCfg,thumbs})); }catch(e){}
+    const {t,font,patUrl,dateTop,dateLeft,dateFs,station,fmLine,gradBg,gradPat,autoDate,manualDate,logoLight,logoDark,logoWhite,logoMain,fmWhite,fmBrick,fmDark,fmMain,ds,templates,carSlides,wCity,wTemp,wCond,wHi,wLo,wIcon,mLeague,mTeamA,mTeamB,mScoreA,mScoreB,mStatus,schedule,customCfg,thumbs,recent,tourSeen,pendingImage,pendingImageFor}=this.state;
+    try{ localStorage.setItem("albalad-studio",JSON.stringify({t,font,patUrl,dateTop,dateLeft,dateFs,station,fmLine,gradBg,gradPat,autoDate,manualDate,logoLight,logoDark,logoWhite,logoMain,fmWhite,fmBrick,fmDark,fmMain,ds,templates,carSlides,wCity,wTemp,wCond,wHi,wLo,wIcon,mLeague,mTeamA,mTeamB,mScoreA,mScoreB,mStatus,schedule,customCfg,thumbs,recent,tourSeen,pendingImage,pendingImageFor})); }catch(e){}
   }
   up(patch){ this.setState(patch,()=>{ this.applyVars(); if(this.state.screen==="edit" && this.state.selected) this.saveDs(); else this.persist(); }); }
   saveDs(){ const sel=this.state.selected; if(!sel){ this.persist(); return; } const snap={}; Object.keys(this.DEFAULTS_DS).forEach(k=>snap[k]=this.state[k]); const ds={...this.state.ds,[sel]:snap}; this.setState({ds},()=>this.persist()); }
-  openDesign(id){ const d={...this.DEFAULTS_DS, ...(this.state.ds[id]||{})}; this.setState({screen:"edit", selected:id, ...d}, ()=>this.applyVars()); }
+  openDesign(id){ this.pushRecent(id); const d={...this.DEFAULTS_DS, ...(this.state.ds[id]||{})}; this.setState({screen:"edit", selected:id, adv:false, ...d}, ()=>{ this.applyVars(); this.maybeFillPending(id); }); }
+  applyQuickNews(){
+    const txt=(this.state.quickHeadline||"").trim();
+    const img=this.state.quickImage||"";
+    if(!txt && !img){ this.flash("اكتب نص الخبر أو أضف صورة أولاً"); return; }
+    const ids=["breaking_photo","breaking_text","news_photo","news_text","text_photo","quote","square","story","quote_deco","audiogram","full_screen"];
+    const photoIds=["breaking_photo","text_photo","square","story","news_photo","audiogram","full_screen"];
+    this.setState(s=>{ const ds={...s.ds}; if(txt) ids.forEach(id=>{ ds[id]={...(ds[id]||{}), headline:txt}; }); return {ds, pendingImage: img||s.pendingImage, pendingImageFor: img?photoIds.slice():s.pendingImageFor}; },()=>{ this.persist(); if(img) this.maybeFillPending(this.state.selected); });
+    this.flash((txt&&img)?"طُبّق النص والصورة — افتح أي قالب ✓":(txt?"طُبّق الخبر على القوالب ✓":"ستُطبَّق الصورة عند فتح قوالب الصور ✓"));
+  }
+  maybeFillPending(id){
+    const img=this.state.pendingImage; if(!img) return;
+    const list=this.state.pendingImageFor||[]; if(list.indexOf(id)<0) return;
+    const slotMap={breaking_photo:"bp_photo",text_photo:"tp_photo",square:"sq_photo",story:"st_photo",news_photo:"np_photo",audiogram:"ag_photo",full_screen:"fs_video"};
+    const sid=slotMap[id]; if(!sid) return;
+    const tryFill=(tries)=>{
+      const slot=this.rootRef.current && this.rootRef.current.querySelector("#"+sid);
+      if(!slot){ if(tries>0) setTimeout(()=>tryFill(tries-1),150); return; }
+      try{ const arr=img.split(","); const mime=(arr[0].match(/:(.*?);/)||[])[1]||"image/png"; const bin=atob(arr[1]); let n=bin.length; const u8=new Uint8Array(n); while(n--) u8[n]=bin.charCodeAt(n); const file=new File([new Blob([u8],{type:mime})],"news."+(mime.split("/")[1]||"png"),{type:mime}); slot._ingest(file); }catch(e){}
+      this.setState(s=>({pendingImageFor:(s.pendingImageFor||[]).filter(x=>x!==id)}),()=>this.persist());
+    };
+    setTimeout(()=>tryFill(16),180);
+  }
+  pushRecent(id){ this.setState(s=>{ const r=[id, ...(s.recent||[]).filter(x=>x!==id)].slice(0,6); return {recent:r}; },()=>this.persist()); }
+  applyVarsAfterQuick(){}
   resetDesign(id){ this.setState(s=>{ const ds={...s.ds}; delete ds[id]; const thumbs={...(s.thumbs||{})}; delete thumbs[id]; return {ds,thumbs}; },()=>this.persist()); }
   saveTemplate(){ if(!this.state.selected) return; const name=prompt("اسم القالب:"); if(!name) return; const snap={}; Object.keys(this.DEFAULTS_DS).forEach(k=>snap[k]=this.state[k]); const tp={id:"tpl"+Date.now(),name,base:this.state.selected,snap}; this.setState(s=>({templates:[...s.templates,tp]}),()=>this.persist()); }
   openTemplate(tp){ this.setState({screen:"edit", selected:tp.base, ...tp.snap}, ()=>this.applyVars()); }
   deleteTemplate(id){ this.setState(s=>({templates:s.templates.filter(x=>x.id!==id)}),()=>this.persist()); }
   setColor(k,v){ this.setState(s=>({t:{...s.t,[k]:v}}),()=>{ this.applyVars(); this.persist(); }); }
+  applyPalette(p){ this.setState({t:{dark:p.dark,brick:p.brick,deep:p.deep,cream:p.cream,gold:p.gold}},()=>{ this.applyVars(); this.persist(); }); }
   pickFile(key,file){ if(!file) return; const r=new FileReader(); r.onload=()=>this.up({[key]:r.result}); r.readAsDataURL(file); }
+  _dsImg(dataUrl,max,fmt){ return new Promise(res=>{ const im=new Image(); im.onload=()=>{ try{ const sc=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)); const w=Math.max(1,Math.round(im.naturalWidth*sc)),h=Math.max(1,Math.round(im.naturalHeight*sc)); const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high'; ctx.drawImage(im,0,0,w,h); let u; try{ u=(fmt==='webp')?cv.toDataURL('image/webp',0.9):cv.toDataURL('image/png'); }catch(e){ u=cv.toDataURL('image/png'); } res(u); }catch(e){ res(dataUrl); } }; im.onerror=()=>res(dataUrl); im.src=dataUrl; }); }
+  pickPattern(file){ if(!file) return; const r=new FileReader(); r.onload=()=>{ this._dsImg(r.result,1100,'png').then(u=>this.up({patUrl:u})); }; r.readAsDataURL(file); }
+  compactStorage(){ try{ const big=(s)=> typeof s==="string"&&s.length>180000; const jobs=[]; const patch={}; if(big(this.state.patUrl)) jobs.push(this._dsImg(this.state.patUrl,1100,'png').then(u=>{patch.patUrl=u;})); const cfg=this.state.customCfg||{}; const pngs=(cfg.pngs||[]).map(p=>p); const idxs=[]; pngs.forEach((p,i)=>{ if(big(p&&p.url)) idxs.push(i); }); idxs.forEach(i=>{ jobs.push(this._dsImg(pngs[i].url,1400,'webp').then(u=>{ pngs[i]={...pngs[i],url:u}; })); }); if(this.state.pendingImage) patch.pendingImage=""; if(!jobs.length && !this.state.pendingImage) return; Promise.all(jobs).then(()=>{ if(idxs.length) patch.customCfg={...cfg,pngs}; if(Object.keys(patch).length){ this.setState(patch,()=>{ this.applyVars(); this.persist(); }); } }); }catch(e){} }
+  pickLogo(key,file){ if(!file) return; const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{ try{ const MAX=1400; const sc=Math.min(1, MAX/Math.max(im.naturalWidth,im.naturalHeight)); const w=Math.max(1,Math.round(im.naturalWidth*sc)), h=Math.max(1,Math.round(im.naturalHeight*sc)); const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high'; ctx.drawImage(im,0,0,w,h); let url; try{ url=cv.toDataURL('image/png'); }catch(e){ url=r.result; } this.up({[key]:url, logoMain:null, fmMain:null, thumbs:{}}); }catch(e){ this.up({[key]:r.result, logoMain:null, fmMain:null, thumbs:{}}); } }; im.onerror=()=>this.up({[key]:r.result, logoMain:null, fmMain:null, thumbs:{}}); im.src=r.result; }; r.readAsDataURL(file); }
+  pickFileMulti(keys,file){ if(!file) return; const r=new FileReader(); r.onload=()=>{ const patch={}; keys.forEach(k=>patch[k]=r.result); this.up(patch); }; r.readAsDataURL(file); }
+  pickMainLogo(file){ if(!file) return; const r=new FileReader(); r.onload=()=>this.up({logoMain:r.result, logoWhite:null, logoLight:null, logoDark:null}); r.readAsDataURL(file); }
+  pickMainFm(file){ if(!file) return; const r=new FileReader(); r.onload=()=>this.up({fmMain:r.result, fmWhite:null, fmBrick:null, fmDark:null}); r.readAsDataURL(file); }
+  resetLogos(){ this.up({logoMain:null, logoWhite:null, logoLight:null, logoDark:null, thumbs:{}}); this.flash("تم حذف اللوغو — ارفع لوغوك الجديد ✓"); }
+  resetFm(){ this.up({fmMain:null, fmWhite:null, fmBrick:null, fmDark:null, thumbs:{}}); this.flash("تم حذف لوغو التردد ✓"); }
+  removeKashida(s){ return (s||"").replace(/\u0640/g,""); }
+  fillLineKashida(line,n){
+    if(n<=0) return line;
+    const DUAL=new Set("بتثجحخسشصضطظعغفقكلمنهيئ".split(""));
+    const AR=/[\u0621-\u064A]/;
+    const pos=[];
+    for(let i=0;i<line.length-1;i++){ if(DUAL.has(line[i])&&AR.test(line[i+1])) pos.push(i); }
+    if(!pos.length) return line;
+    const counts={};
+    for(let k=0;k<n;k++){ const p=pos[k%pos.length]; counts[p]=(counts[p]||0)+1; }
+    let out="";
+    for(let i=0;i<line.length;i++){ out+=line[i]; if(counts[i]) out+="\u0640".repeat(counts[i]); }
+    return out;
+  }
+  justifyKashida(){
+    try{
+      const root=this.rootRef.current; if(!root) return;
+      const node=root.querySelector("[data-export-node]"); if(!node) return;
+      const raw=this.removeKashida(this.state.headline||"").replace(/\s+/g," ").trim();
+      const useK=this.state.txtAlign==="justify" && raw.length>0;
+      const cands=[...node.querySelectorAll("p,div,span")].filter(el=>{
+        if(el.children.length) return false;
+        return this.removeKashida(el.textContent).replace(/\s+/g," ").trim()===raw;
+      });
+      cands.forEach(el=>{
+        const block=(el.clientWidth>20)?el:(el.parentElement||el);
+        // Keep the design's NATIVE justify + wrapping (flush edges, correct line
+        // count). Only undo any earlier manual wrapping and inject kashida-elongated
+        // text, so native justification has far less blank space to push between words.
+        block.style.whiteSpace="";
+        const target = useK ? this.addKashida(raw, 6) : raw;
+        if(el.textContent!==target) el.textContent=target;
+      });
+    }catch(e){}
+  }
+  addKashida(s, density){
+    s = this.removeKashida(s);
+    // Dual-joining letters connect to BOTH sides — a kashida (ـ U+0640) may be
+    // inserted only AFTER one of these AND before another Arabic letter.
+    // Right-joining-only letters (ا أ إ آ د ذ ر ز و ؤ ة ء ى) never connect to the
+    // next letter, so no kashida may follow them. Spaces/punctuation excluded.
+    const DUAL = new Set("بتثجحخسشصضطظعغفقكلمنهيئ".split(""));
+    const ARLET = /[\u0621-\u064A]/;
+    const KAF="ك", LAM="ل";
+    return s.split(/(\s+)/).map(w=>{
+      if(/\s/.test(w) || w.length<3) return w;
+      const pos=[];
+      for(let i=0;i<w.length-1;i++){ if(DUAL.has(w[i]) && ARLET.test(w[i+1])) pos.push(i); }
+      if(!pos.length) return w;
+      // Classical priority: after kaf/before lam first, then before the final
+      // letter, then a middle point. Density caps how many per word.
+      const ranked = pos.slice().sort((a,b)=>{
+        const score=(i)=> (w[i]===KAF?3:0) + (w[i+1]===LAM?2:0) + (i===pos[pos.length-1]?1:0);
+        return score(b)-score(a);
+      });
+      const chosen = ranked.slice(0, Math.max(1, Math.min(density, pos.length)));
+      const set = new Set(chosen);
+      const arr=[];
+      for(let i=0;i<w.length;i++){ arr.push(w[i]); if(set.has(i)) arr.push("\u0640"); }
+      return arr.join("");
+    }).join("");
+  }
   genPickImage(file){ if(!file) return; const r=new FileReader(); r.onload=()=>this.setState({genImage:r.result}); r.readAsDataURL(file); }
   fillSlot(slotId,dataUrl){
     if(!dataUrl) return;
@@ -899,7 +1178,7 @@ class Component extends DCLogic {
     if(this.state.genHeadline && this.state.genHeadline.trim()) patch.headline=this.state.genHeadline;
     if(this.state.genTicker && this.state.genTicker.trim()) patch.ticker=this.state.genTicker;
     const d={...this.DEFAULTS_DS, ...(this.state.ds[id]||{}), ...patch, showPhoto:true};
-    this.setState({screen:"edit", selected:id, generatorOpen:false, ...d}, ()=>{
+    this.setState({screen:"edit", selected:id, generatorOpen:false, adv:false, ...d}, ()=>{
       this.applyVars();
       if(this.state.genImage && slotMap[id]) this.fillSlot(slotMap[id], this.state.genImage);
     });
@@ -913,7 +1192,7 @@ class Component extends DCLogic {
   setPngScale(i,v){ this.setState(s=>{ const pngs=s.customCfg.pngs.slice(); if(!pngs[i])return null; pngs[i]={...pngs[i],s:Math.max(0.2,Math.min(4,v))}; return {customCfg:{...s.customCfg,pngs}}; },()=>this.persist()); }
   migratePngs(){ this.setState(s=>{ const c=s.customCfg||{}; const pngs=(c.pngs||[]); let changed=false; const np=pngs.map((p,i)=>{ if(p && !p.id){ changed=true; return {...p, id:"p"+Date.now()+"_"+i, s:(p.s||1), x:(p.x||0), y:(p.y||0)}; } return p; }); if(!changed) return null; const layers=(c.layers||[]).slice(); np.forEach(p=>{ if(!layers.includes("png:"+p.id)) layers.push("png:"+p.id); }); return {customCfg:{...c, pngs:np, layers}}; },()=>{this.persist(); this.backfillAr();}); }
   backfillAr(){ const pngs=(this.state.customCfg&&this.state.customCfg.pngs)||[]; pngs.forEach((p,i)=>{ if(p && p.url && !p.ar){ const im=new Image(); im.onload=()=>{ const ar=(im.naturalWidth&&im.naturalHeight)?(im.naturalWidth/im.naturalHeight):1; this.setState(s=>{ const arr=s.customCfg.pngs.slice(); if(arr[i]&&arr[i].id===p.id) arr[i]={...arr[i],ar}; return {customCfg:{...s.customCfg,pngs:arr}}; },()=>this.persist()); }; im.src=p.url; } }); }
-  exportPng(){
+  _capture(cb){
     const node=this.rootRef.current && this.rootRef.current.querySelector("[data-export-node]");
     if(!node || !window.html2canvas){ alert("جارٍ تحميل أداة التصدير، حاول بعد لحظات."); return; }
     const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}[data-cimgresize]{display:none!important}"; document.head.appendChild(st);
@@ -924,10 +1203,55 @@ class Component extends DCLogic {
     const trans=this.state.exportTransparent;
     const prevBg=node.style.background;
     if(trans) node.style.background="transparent";
-    window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:0}).then(c=>{
-      const a=document.createElement("a"); a.download="albalad-"+this.state.selected+(trans?"-transparent":"")+".png"; a.href=c.toDataURL("image/png"); a.click();
-      node.style.background=prevBg; st.remove(); if(stg) stg.style.transform=stgT;
-    }).catch(()=>{ node.style.background=prevBg; st.remove(); if(stg) stg.style.transform=stgT; });
+    const done=()=>{ node.style.background=prevBg; st.remove(); if(stg) stg.style.transform=stgT; };
+    const rs=getComputedStyle(this.rootRef.current);
+    const pick=(p)=>{ const v=rs.getPropertyValue(p).trim(); return (v.match(/url\((?:["']?)(.*?)(?:["']?)\)/)||[])[1]||""; };
+    const abs=(s)=> (s && !/^data:/.test(s)) ? (new URL(s, location.href)).href : s;
+    const curSrc=abs(pick("--logoCur")), fmSrc=abs(pick("--fmCur"));
+    let exBg="rgb(27,35,38)"; try{ const c=getComputedStyle(node).backgroundColor; if(c && c!=="rgba(0, 0, 0, 0)" && c!=="transparent") exBg=c; }catch(e){}
+    const onclone=(doc)=>{ try{
+      doc.querySelectorAll("*").forEach(el=>{
+        const stl=el.getAttribute&&el.getAttribute("style"); if(!stl) return;
+        let src=""; if(stl.indexOf("var(--logoCur)")>=0) src=curSrc; else if(stl.indexOf("var(--fmCur)")>=0) src=fmSrc; else return;
+        if(!src) return;
+        el.style.backgroundImage="none";
+        if(getComputedStyle(el).position==="static") el.style.position="relative";
+        const img=doc.createElement("img"); img.src=src; img.setAttribute("crossorigin","anonymous");
+        img.style.cssText="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;";
+        el.appendChild(img);
+      });
+      doc.querySelectorAll("*").forEach(el=>{
+        const stl=el.getAttribute&&el.getAttribute("style"); if(!stl||stl.indexOf("var(--patMask")<0) return;
+        let g;
+        if(stl.indexOf("patMaskTop")>=0) g="linear-gradient(to bottom, transparent 0%, "+exBg+" 100%)";
+        else if(stl.indexOf("patMaskBot")>=0) g="linear-gradient(to top, transparent 0%, "+exBg+" 100%)";
+        else g="linear-gradient(to bottom, "+exBg+" 0%, transparent 32%, transparent 68%, "+exBg+" 100%)";
+        el.style.webkitMaskImage="none"; el.style.maskImage="none";
+        if(!el.parentElement) return;
+        const ov=doc.createElement("div"); ov.style.cssText="position:absolute;left:"+el.offsetLeft+"px;top:"+el.offsetTop+"px;width:"+el.offsetWidth+"px;height:"+el.offsetHeight+"px;pointer-events:none;background:"+g+";";
+        el.parentElement.insertBefore(ov, el.nextSibling);
+      });
+    }catch(e){} };
+    window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:15000,onclone}).then(c=>{ done(); cb(c,trans); }).catch(()=>{ done(); });
+  }
+  exportPng(){ this._capture((c,trans)=>{ const a=document.createElement("a"); a.download="albalad-"+this.state.selected+(trans?"-transparent":"")+".png"; a.href=c.toDataURL("image/png"); a.click(); }); }
+  sharePng(){
+    this._capture((c)=>{ c.toBlob(async(blob)=>{ if(!blob) return; const file=new File([blob],"albalad-"+this.state.selected+".png",{type:"image/png"});
+      try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:"راديو البلد", text:"راديو البلد · FM 102.6"}); return; } }catch(e){ return; }
+      const a=document.createElement("a"); a.download=file.name; a.href=URL.createObjectURL(blob); a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); this.flash("المشاركة غير مدعومة — تم التنزيل بدلاً منها");
+    },"image/png"); });
+  }
+  copyPng(){
+    this._capture((c)=>{ c.toBlob(async(blob)=>{ if(!blob) return;
+      try{ await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]); this.flash("تم نسخ الصورة ✓"); }
+      catch(e){ this.flash("النسخ غير مدعوم — استخدم «تنزيل»"); }
+    },"image/png"); });
+  }
+  flash(msg){
+    let el=document.createElement("div"); el.textContent=msg;
+    el.style.cssText="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#1b2326;color:#fdf6e3;border:1px solid #f2d47e;border-radius:10px;padding:11px 22px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:600;font-size:14px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;";
+    document.body.appendChild(el); requestAnimationFrame(()=>el.style.opacity="1");
+    setTimeout(()=>{ el.style.opacity="0"; setTimeout(()=>el.remove(),300); },1900);
   }
   captureThumb(done){
     const sel=this.state.selected;
@@ -944,6 +1268,7 @@ class Component extends DCLogic {
     }).catch(()=>{ st.remove(); if(stg) stg.style.transform=stgT; if(done)done(); });
   }
   leaveEdit(to){ if(this.state.screen==="edit"){ this.captureThumb(()=>this.setState({screen:to})); } else { this.setState({screen:to}); } }
+  fitScale(){ let hs=this.state.headScale; if(this.state.autoFit){ const sel=this.state.selected; let txt=this.state.headline||""; if(sel==="now_air") txt=(this.state.program||"")+" "+(this.state.host||""); const n=txt.trim().length; let f=1; if(n>=190) f=0.5; else if(n>45) f=1-((n-45)/145)*0.5; hs=hs*f; } return hs; }
   dates(){
     const d=new Date(); const dd=String(d.getDate()).padStart(2,"0"); const mm=String(d.getMonth()+1).padStart(2,"0"); const yyyy=""+d.getFullYear();
     if(this.state.autoDate) return {dm:dd+"."+mm, y:yyyy, full:dd+"."+mm+"."+yyyy};
@@ -959,6 +1284,8 @@ class Component extends DCLogic {
     const list=[
       {id:"breaking_photo",name:"عاجل — صورة + نص",cat:"منشور"},
       {id:"breaking_text",name:"عاجل — نص",cat:"منشور"},
+      {id:"news_photo",name:"خبر — صورة",cat:"منشور"},
+      {id:"news_text",name:"خبر — بدون صورة",cat:"منشور"},
       {id:"text_photo",name:"نص + صورة",cat:"منشور"},
       {id:"quote",name:"اقتباس",cat:"منشور"},
       {id:"square",name:"منشور مربّع",cat:"منشور"},
@@ -975,9 +1302,37 @@ class Component extends DCLogic {
     ];
     const designs=list.map(x=>{ const thumb=(this.state.thumbs||{})[x.id]; const edited=!!thumb||!!(this.state.ds||{})[x.id]; return {...x, open:()=>this.openDesign(x.id), hasThumb:!!thumb, noThumb:!thumb, canDelete:edited, hideDelete:!edited, reset:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); if(confirm("حذف هذا المنشور وإرجاعه للحالة الافتراضية؟")) this.resetDesign(x.id); }, thumbStyle: thumb?{position:"absolute",inset:0,width:"100%",height:"100%",backgroundImage:'url("'+thumb+'")',backgroundSize:"contain",backgroundRepeat:"no-repeat",backgroundPosition:"center",backgroundColor:"#11171a"}:null }; });
     const selName=(list.find(x=>x.id===sel)||{}).name||"";
+    const byId=Object.fromEntries(designs.map(d=>[d.id,d]));
+    const recentDesigns=(this.state.recent||[]).map(id=>byId[id]).filter(Boolean).slice(0,5);
     return {
+      hasRecent:recentDesigns.length>0,
+      recentDesigns,
+      quickHeadline:this.state.quickHeadline,
+      onQuickHeadline:ev(v=>this.setState({quickHeadline:v})),
+      quickImgLabel:this.state.quickImage?"الصورة جاهزة ✓":"أضف صورة",
+      onQuickImage:e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>this.setState({quickImage:r.result}); r.readAsDataURL(f); },
+      applyQuickNews:()=>this.applyQuickNews(),
+      showTour:this.state.tourOpen || (this.state.screen==="home" && !this.state.tourSeen),
+      openTour:()=>this.setState({tourOpen:true}),
+      closeTour:()=>this.setState({tourOpen:false, tourSeen:true},()=>this.persist()),
+      tourSteps:[
+        {icon:"\uD83D\uDDBC\uFE0F", title:"اختر تصميماً", body:"اضغط «اختر تصميماً» ثم انقر أي قالب لفتحه — عاجل، خبر، اقتباس، بث، طقس، وغيرها."},
+        {icon:"\u270F\uFE0F", title:"اكتب وبدّل الصورة", body:"عدّل النص واسحب صورتك مباشرةً على التصميم. النص الطويل يصغّر نفسه تلقائياً."},
+        {icon:"\u2699\uFE0F", title:"تعديل كامل", body:"زر «تعديل التصميم» يفتح الألوان والنقشة والمواضع. الإعدادات للوغو والتردد العام."},
+        {icon:"\u2913", title:"احفظ وشارك", body:"«حفظ بدقة عالية» ينزّل الصورة، و«مشاركة»/«نسخ» للنشر السريع على السوشيال."}
+      ],
       rootRef:this.rootRef,
       stageRef:this.stageRef,
+      adv:this.state.adv,
+      toggleAdv:()=>this.setState(s=>({adv:!s.adv})),
+      advBtnLabel:this.state.adv?"✓ وضع التعديل الكامل (اضغط للإخفاء)":"✎ تعديل التصميم (ألوان، نقشة، مواضع…)",
+      advBtnBg:this.state.adv?"#26312f":"var(--brick)",
+      advBtnFg:this.state.adv?"#f2d47e":"#fdf6e3",
+      adv:this.state.adv,
+      toggleAdv:()=>this.setState(s=>({adv:!s.adv})),
+      advBtnLabel:this.state.adv?"✓ وضع التعديل الكامل (اضغط للإخفاء)":"✎ تعديل التصميم (ألوان، نقشة، مواضع…)",
+      advBtnBg:this.state.adv?"#26312f":"var(--brick)",
+      advBtnFg:this.state.adv?"#f2d47e":"#fdf6e3",
       isHome:this.state.screen==="home", isPick:this.state.screen==="pick", isEdit:this.state.screen==="edit",
       isSettings:this.state.settingsOpen,
       isGenerator:this.state.generatorOpen,
@@ -1048,8 +1403,18 @@ class Component extends DCLogic {
       openSettings:()=>this.setState({settingsOpen:true}),
       closeSettings:()=>this.setState({settingsOpen:false}),
       exportPng:()=>this.exportPng(),
+      shareImg:()=>this.sharePng(),
+      copyImg:()=>this.copyPng(),
       resetAll:()=>this.up({...this.DEFAULTS_DS}),
       onDark:ev(v=>this.setColor("dark",v)), onBrick:ev(v=>this.setColor("brick",v)), onDeep:ev(v=>this.setColor("deep",v)),
+      bgToggle:["breaking_photo","breaking_text","news_photo","news_text","text_photo","square","quote_deco","match","story","now_air","audiogram"].indexOf(sel)>=0,
+      bgEff:(this.state.bgMode || (["breaking_text","news_text","story","now_air","audiogram"].indexOf(sel)>=0?"brick":"dark")),
+      bgDarkBorder:((this.state.bgMode || (["breaking_text","news_text","story","now_air","audiogram"].indexOf(sel)>=0?"brick":"dark"))==="dark")?"#f2d47e":"#3a4448",
+      bgBrickBorder:((this.state.bgMode || (["breaking_text","news_text","story","now_air","audiogram"].indexOf(sel)>=0?"brick":"dark"))==="brick")?"#f2d47e":"#3a4448",
+      setBgDark:()=>this.up({bgMode:"dark"}), setBgBrick:()=>this.up({bgMode:"brick"}),
+      palettes:[
+        {name:"ألوان الهوية", dark:"#1b2326", brick:"#c1624c", deep:"#b94126", cream:"#fdf6e3", gold:"#f2d47e"}
+      ].map(p=>({name:p.name, c0:p.dark, c1:p.brick, c2:p.deep, c3:p.gold, apply:()=>this.applyPalette(p)})),
       onCream:ev(v=>this.setColor("cream",v)), onGold:ev(v=>this.setColor("gold",v)),
       onRadius:ev(v=>this.up({radius:parseInt(v)})),
       onPtopOp:ev(v=>this.up({ptopOp:parseFloat(v)})), onPtopSize:ev(v=>this.up({ptopSize:parseInt(v)})), onPtopY:ev(v=>this.up({ptopY:parseInt(v)})),
@@ -1057,10 +1422,22 @@ class Component extends DCLogic {
       onPboxOp:ev(v=>this.up({pboxOp:parseFloat(v)})), onPboxSize:ev(v=>this.up({pboxSize:parseInt(v)})),
       onBar:e=>this.up({bar:e.target.checked}), onFont:ev(v=>this.up({font:v})),
       onShowLogo:e=>this.up({showLogo:e.target.checked}), onShowFreq:e=>this.up({showFreq:e.target.checked}), onShowPhoto:e=>this.up({showPhoto:e.target.checked}),
-      onPatternFile:e=>this.pickFile("patUrl",e.target.files[0]),
+      showBadge:this.state.showBadge, textScrim:this.state.textScrim,
+      onShowBadge:e=>this.up({showBadge:e.target.checked}), onTextScrim:e=>this.up({textScrim:e.target.checked}),
+      isBreakingType:["breaking_photo","breaking_text","story"].indexOf(sel)>=0,
+      canScrim:["story"].indexOf(sel)>=0,
+      scrimOn:["story"].indexOf(sel)>=0 && !!this.state.textScrim,
+      scrimAmt:this.state.scrimAmt==null?0.6:this.state.scrimAmt,
+      onScrimAmt:ev(v=>this.up({scrimAmt:parseFloat(v)})),
+      isBoxWidth:sel==="breaking_text",
+      boxW:this.state.boxW==null?100:this.state.boxW,
+      onBoxW:ev(v=>this.up({boxW:parseInt(v)})),
+      setToneAuto:()=>this.up({logoTone:"auto"}), setToneGold:()=>this.up({logoTone:"gold"}), setToneBrick:()=>this.up({logoTone:"brick"}),
+      toneAutoB:(this.state.logoTone||"auto")==="auto"?"#f2d47e":"#3a4448", toneGoldB:this.state.logoTone==="gold"?"#f2d47e":"#3a4448", toneBrickB:this.state.logoTone==="brick"?"#f2d47e":"#3a4448",
+      onPatternFile:e=>this.pickPattern(e.target.files[0]),
       openBuilder:()=>this.setState({builderOpen:true}),
       closeBuilder:()=>this.setState({builderOpen:false}),
-      createCustom:()=>{ const d={...this.DEFAULTS_DS, ...(this.state.ds["custom"]||{})}; this.setState({selected:"custom",screen:"edit",builderOpen:false, ...d},()=>this.applyVars()); },
+      createCustom:()=>{ const d={...this.DEFAULTS_DS, ...(this.state.ds["custom"]||{})}; this.setState({selected:"custom",screen:"edit",builderOpen:false, adv:true, ...d},()=>this.applyVars()); },
       onCfgSize:e=>this.setCfg({size:e.target.value}), onCfgBg:e=>this.setCfg({bg:e.target.value}),
       isCustomSize:this.state.customCfg.size==="custom",
       onCfgW:e=>this.setCfg({customW:e.target.value}), onCfgH:e=>this.setCfg({customH:e.target.value}),
@@ -1070,13 +1447,27 @@ class Component extends DCLogic {
       pngList:this.state.customCfg.pngs.map((p,i)=>({n:i+1, front:()=>this.pngToFront(i), del:()=>this.pngDel(i)})),
       layerList:(()=>{ const c=this.state.customCfg; const names={image:"الصورة",badge:"شارة عاجل",text:"النص",logo:"اللوغو"}; const ord=this.effOrder(c); const pIdx={}; c.pngs.forEach((p,i)=>pIdx["png:"+p.id]=i); return ord.slice().reverse().map((id,k)=>{ const pi=(id in pIdx)?pIdx[id]:-1; const png=pi>=0?c.pngs[pi]:null; const isLogo=id==="logo"; const isImg=id==="image"; const ls=this.state.logoS||1; const cz=this.state.cimgS||1; const fit=(c.imgFit||"cover")==="contain"?"contain":"cover"; const fitNext=fit==="cover"?"contain":"cover"; const fitLbl=fit==="cover"?"يملأ الإطار":"كامل الصورة"; return { id, name: png?("صورة "+(pi+1)):(names[id]||id), top:k===0, bottom:k===ord.length-1, up:()=>this.moveLayer(id,1), down:()=>this.moveLayer(id,-1), isPng:!!png, isImg, fitLabel: fitLbl, toggleFit:()=>this.setCfg({imgFit:fitNext}), resizable:!!png||isLogo||isImg, scale: png?(png.s||1):(isLogo?ls:(isImg?cz:1)), onScale: png?ev(v=>this.setPngScale(pi,parseFloat(v))):(isLogo?ev(v=>this.up({logoS:parseFloat(v)})):(isImg?ev(v=>this.up({cimgS:parseFloat(v)})):null)), bigger: png?(()=>this.setPngScale(pi,(png.s||1)+0.1)):(isLogo?(()=>this.up({logoS:Math.min(3,ls+0.1)})):(isImg?(()=>this.up({cimgS:Math.min(4,cz+0.1)})):null)), smaller: png?(()=>this.setPngScale(pi,(png.s||1)-0.1)):(isLogo?(()=>this.up({logoS:Math.max(0.3,ls-0.1)})):(isImg?(()=>this.up({cimgS:Math.max(0.5,cz-0.1)})):null)), del: png?(()=>this.pngDel(pi)):null }; }); })(),
       bold:this.state.bold,
-      headScale:this.state.headScale, txtAlign:this.state.txtAlign, txtPad:this.state.txtPad,
+      headScale:this.state.headScale, txtAlign:this.state.txtAlign, txtPad:this.state.txtPad, autoFit:this.state.autoFit,
+      onAutoFit:e=>this.up({autoFit:e.target.checked}),
       onBold:e=>this.up({bold:e.target.checked}),
       onHeadScale:ev(v=>this.up({headScale:parseFloat(v)})), onTxtAlign:ev(v=>this.up({txtAlign:v})), onTxtPad:ev(v=>this.up({txtPad:parseInt(v)})),
+      wordSp:this.state.wordSp==null?0:this.state.wordSp, lineH:this.state.lineH==null?1.65:this.state.lineH,
+      onWordSp:ev(v=>this.up({wordSp:parseInt(v)})), onLineH:ev(v=>this.up({lineH:parseFloat(v)})),
       onImgY:ev(v=>this.up({imgY:parseInt(v)})), onImgX:ev(v=>this.up({imgX:parseInt(v)})), onBoxY:ev(v=>this.up({boxY:parseInt(v)})), onBadgeY:ev(v=>this.up({badgeY:parseInt(v)})),
       slotReplace:()=>this.slotReplace(), slotClear:()=>this.slotClear(),
       imgScale:this.state.imgScale, onImgScale:ev(v=>this.up({imgScale:parseFloat(v)})),
-      hasPhoto:["breaking_photo","text_photo","square","story","full_screen","audiogram"].includes(sel),
+      hasPhoto:["breaking_photo","text_photo","square","story","full_screen","audiogram","news_photo"].includes(sel),
+      isNewsPhoto:sel==="news_photo",
+      notNewsPhoto:sel!=="news_photo",
+      fHeadline:["breaking_photo","breaking_text","text_photo","quote","square","story","quote_deco","audiogram","news_photo","news_text"].includes(sel),
+      fTicker:["full_screen"].includes(sel),
+      fGuest:["quote","full_screen","quote_deco","audiogram"].includes(sel),
+      fGuestTitle:["quote","full_screen","quote_deco","audiogram"].includes(sel),
+      fProgram:["now_air","audiogram"].includes(sel),
+      fHost:["now_air"].includes(sel),
+      fAgLabel:["audiogram"].includes(sel),
+      hasTextFields:["breaking_photo","breaking_text","text_photo","quote","square","story","full_screen","now_air","quote_deco","audiogram","news_photo","news_text"].includes(sel),
+      headlineLabel:["quote","quote_deco","audiogram"].includes(sel)?"نص الاقتباس / الجملة":"عنوان الخبر",
       isCustomSel:sel==="custom",
       cImgOn:sel==="custom" && !!this.state.customCfg.showImg,
       cimgW:this.state.cimgW, cimgH:this.state.cimgH, cimgPX:this.state.cimgPX, cimgPY:this.state.cimgPY, cimgS:this.state.cimgS,
@@ -1100,6 +1491,9 @@ class Component extends DCLogic {
       onGuest:ev(v=>this.up({guest:v})), onGuestTitle:ev(v=>this.up({guestTitle:v})),
       onProgram:ev(v=>this.up({program:v})), onHost:ev(v=>this.up({host:v})), onAgLabel:ev(v=>this.up({agLabel:v})),
       onLogoLight:e=>this.pickFile("logoLight",e.target.files[0]), onLogoDark:e=>this.pickFile("logoDark",e.target.files[0]), onLogoWhite:e=>this.pickFile("logoWhite",e.target.files[0]),
+      onLogoBrickVer:e=>this.pickLogo("logoWhite",e.target.files[0]), onLogoDarkVer:e=>this.pickLogo("logoLight",e.target.files[0]),
+      onFmBrickVer:e=>this.pickLogo("fmWhite",e.target.files[0]), onFmDarkVer:e=>this.pickLogo("fmBrick",e.target.files[0]),
+      resetLogos:()=>this.resetLogos(), resetFm:()=>this.resetFm(),
       onFmWhite:e=>this.pickFile("fmWhite",e.target.files[0]), onFmBrick:e=>this.pickFile("fmBrick",e.target.files[0]), onFmDark:e=>this.pickFile("fmDark",e.target.files[0]),
       schedule:this.state.schedule,
       isSchedule:sel==="schedule",
@@ -1118,7 +1512,7 @@ class Component extends DCLogic {
   }
   editSched(i,k,v){ this.setState(s=>{ const sc=s.schedule.slice(); sc[i]={...sc[i],[k]:v}; return {schedule:sc}; },()=>this.persist()); }
   exportSettings(){
-    const keys=["t","font","patUrl","dateTop","dateLeft","dateFs","station","fmLine","gradBg","gradPat","autoDate","manualDate","logoLight","logoDark","logoWhite","fmWhite","fmBrick","fmDark","ds","templates","carSlides","wCity","wTemp","wCond","wHi","wLo","wIcon","mLeague","mTeamA","mTeamB","mScoreA","mScoreB","mStatus","schedule","customCfg"];
+    const keys=["t","font","patUrl","dateTop","dateLeft","dateFs","station","fmLine","gradBg","gradPat","autoDate","manualDate","logoLight","logoDark","logoWhite","logoMain","fmWhite","fmBrick","fmDark","fmMain","ds","templates","carSlides","wCity","wTemp","wCond","wHi","wLo","wIcon","mLeague","mTeamA","mTeamB","mScoreA","mScoreB","mStatus","schedule","customCfg"];
     const out={}; keys.forEach(k=>out[k]=this.state[k]);
     const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="albalad-identity-settings.json"; a.click();

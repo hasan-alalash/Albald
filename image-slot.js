@@ -50,9 +50,12 @@
 
 (() => {
   const STATE_FILE = '.image-slots.state.json';
-  // 2× a ~600px slot in a 1920-wide deck — retina-sharp without making the
-  // sidecar enormous. A 1200px WebP at q=0.85 is ~150-300KB.
-  const MAX_DIM = 1200;
+  // Longest side cap for stored images. Social posts export at 1080–1920px and
+  // up to 3–4× scale, so we keep a high cap (2600) for crisp output. The stored
+  // size is decoupled from the on-screen slot width — the design stage shrinks
+  // slots on small screens, and basing the cap on that would store a tiny,
+  // blurry image. WebP q0.9 at 2600px is typically ~300–700KB.
+  const MAX_DIM = 2600;
   // Raster formats only. SVG is excluded (can carry script; createImageBitmap
   // on SVG blobs is inconsistent). GIF is excluded because the canvas
   // re-encode keeps only the first frame, so an animated GIF would silently
@@ -146,14 +149,19 @@
   async function toDataUrl(file, targetW) {
     const bitmap = await createImageBitmap(file);
     try {
-      const cap = Math.min(MAX_DIM, Math.max(1, Math.round(targetW * 2)) || MAX_DIM);
+      // Cap at MAX_DIM only — never shrink to the on-screen slot size, so a
+      // slot rendered small (mobile / scaled stage) still stores a high-res
+      // image fit for full-resolution export.
+      const cap = MAX_DIM;
       const scale = Math.min(1, cap / Math.max(bitmap.width, bitmap.height));
       const w = Math.max(1, Math.round(bitmap.width * scale));
       const h = Math.max(1, Math.round(bitmap.height * scale));
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
-      return canvas.toDataURL('image/webp', 0.85);
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(bitmap, 0, 0, w, h);
+      return canvas.toDataURL('image/webp', 0.92);
     } finally {
       bitmap.close && bitmap.close();
     }
@@ -163,7 +171,7 @@
   const stylesheet =
     ':host{display:inline-block;position:relative;vertical-align:top;' +
     '  font:13px/1.3 system-ui,-apple-system,sans-serif;color:rgba(0,0,0,.55);width:240px;height:160px}' +
-    '.frame{position:absolute;inset:0;overflow:hidden;background:rgba(0,0,0,.04)}' +
+    '.frame{position:absolute;inset:0;overflow:hidden;background:transparent}' +
     // .frame img (clipped) and .spill (unclipped ghost + handles) share the
     // same left/top/width/height in frame-%, computed by _applyView(), so the
     // inside-mask crop and the outside-mask spill stay pixel-aligned.
@@ -191,6 +199,7 @@
     ':host([data-reframe]) .frame{box-shadow:0 0 0 2px #c96442}' +
     '.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;' +
     '  justify-content:center;gap:6px;text-align:center;padding:12px;box-sizing:border-box;' +
+    '  background:rgba(0,0,0,.04);' +
     '  cursor:pointer;user-select:none}' +
     '.empty svg{opacity:.45}' +
     '.empty .cap{max-width:90%;font-weight:500;letter-spacing:.01em}' +
@@ -521,7 +530,9 @@
       const iw = this._img.naturalWidth, ih = this._img.naturalHeight;
       const fw = this.clientWidth, fh = this.clientHeight;
       if (!iw || !ih || !fw || !fh) return null;
-      return { iw, ih, fw, fh, base: Math.max(fw / iw, fh / ih) };
+      // ~0.6% cover overscan so a sub-pixel rounding gap at the frame edge never
+      // reveals a hairline of the background behind the image.
+      return { iw, ih, fw, fh, base: Math.max(fw / iw, fh / ih) * 1.006 };
     }
 
     _clampView() {
