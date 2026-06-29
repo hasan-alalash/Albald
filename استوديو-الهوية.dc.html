@@ -1271,8 +1271,13 @@ class Component extends DCLogic {
     const st=document.createElement("style"); st.textContent="image-slot::part(empty){display:none!important}image-slot::part(ring){display:none!important}[data-cimgresize]{display:none!important}"; document.head.appendChild(st);
     const stg=this.stageRef&&this.stageRef.current; const stgT=stg?stg.style.transform:""; if(stg) stg.style.transform="";
     const w=+node.getAttribute("data-w")||node.offsetWidth;
+    const hAttr=+node.getAttribute("data-h")||node.offsetHeight;
     const q=Math.max(2,this.state.exportScale||3);
-    const scale=(w/node.offsetWidth)*q;
+    // iOS Safari caps canvas at ~4096px per side; clamp so the longest rendered
+    // side stays ≤ 4000px or toDataURL returns blank / fails (broken download).
+    const longest=Math.max(w, hAttr);
+    const safeQ=Math.min(q, 4000/longest);
+    const scale=(w/node.offsetWidth)*Math.max(1.2, safeQ);
     const trans=this.state.exportTransparent;
     const prevBg=node.style.background;
     if(trans) node.style.background="transparent";
@@ -1307,7 +1312,20 @@ class Component extends DCLogic {
     }catch(e){} };
     window.html2canvas(node,{scale,backgroundColor:null,useCORS:true,logging:false,imageTimeout:15000,onclone}).then(c=>{ done(); cb(c,trans); }).catch(()=>{ done(); });
   }
-  exportPng(){ this._capture((c,trans)=>{ const a=document.createElement("a"); a.download="albalad-"+this.state.selected+(trans?"-transparent":"")+".png"; a.href=c.toDataURL("image/png"); a.click(); this.archiveShot(c); }); }
+  exportPng(){ this._capture((c,trans)=>{ this._download(c, "albalad-"+this.state.selected+(trans?"-transparent":"")+".png"); this.archiveShot(c); }); }
+  _download(c, name){
+    const finish=(blob)=>{
+      try{
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a"); a.download=name; a.href=url; a.rel="noopener";
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 4000);
+        this.flash("تم حفظ الصورة ✓");
+      }catch(e){ this.flash("تعذّر الحفظ — جرّب «معاينة» ثم اضغط مطوّلاً على الصورة"); }
+    };
+    if(c.toBlob){ c.toBlob(b=>{ if(b) finish(b); else this.flash("تعذّر إنشاء الصورة"); }, "image/png"); }
+    else { try{ const a=document.createElement("a"); a.download=name; a.href=c.toDataURL("image/png"); a.click(); }catch(e){ this.flash("تعذّر الحفظ"); } }
+  }
   openPreview(){ this._capture((c)=>{ try{ const url=c.toDataURL("image/png"); this.setState({previewOpen:true, previewUrl:url, previewDims:c.width+" × "+c.height+" بكسل"}); }catch(e){ this.flash("تعذّرت المعاينة"); } }); }
   closePreview(){ this.setState({previewOpen:false, previewUrl:""}); }
   savePreview(){ const url=this.state.previewUrl; if(!url) return; const a=document.createElement("a"); a.download="albalad-"+this.state.selected+".png"; a.href=url; a.click(); const im=new Image(); im.onload=()=>this.archiveShot(im); im.src=url; this.setState({previewOpen:false}); this.flash("تم الحفظ ✓"); }

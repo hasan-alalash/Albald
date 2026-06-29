@@ -1,7 +1,7 @@
 // Service worker for راديو البلد studio PWA.
 // Network-first for the app code (HTML/JS/JSON) so updates always propagate;
 // cache-first for static media (images/fonts) for speed + offline.
-const CACHE = 'albalad-studio-v9';
+const CACHE = 'albalad-studio-v11';
 
 const SHELL = [
   './',
